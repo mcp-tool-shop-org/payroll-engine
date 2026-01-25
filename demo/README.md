@@ -1,6 +1,32 @@
 # Payroll Engine Demo
 
-A read-only demo viewer showing the complete payroll lifecycle with AI advisories.
+A read-only interactive demo showcasing the complete payroll lifecycle with AI advisories.
+
+> **Note:** Synthetic data only. Read-only API. No real money movement.
+
+## Screenshots
+
+### Run Payroll Dashboard
+![Run Payroll](screenshots/01-run-payroll-light.png)
+*Payroll summary with employee breakdown showing gross pay, deductions, taxes, and net pay.*
+
+### Time Entry
+![Time Entry](screenshots/02-time-entry-light.png)
+*Interactive timesheet with editable hours. Overtime highlighted in amber.*
+
+### Employee Management
+![Employees](screenshots/03-employees-dark.png)
+*Employee cards with earning codes and deduction codes configuration.*
+
+### Double-Entry Ledger
+![Ledger](screenshots/04-ledger-light.png)
+*Complete audit trail showing reservations, payments, and reversals with debit/credit tracking.*
+
+### AI Advisories
+![AI Advisories](screenshots/05-ai-advisories-dark.png)
+*Intelligent risk analysis with confidence scores and contributing factors.*
+
+---
 
 ## What It Shows
 
@@ -145,7 +171,29 @@ demo/
 │   ├── seed.py          # Database seeder
 │   ├── setup_db_roles.sql  # DB role setup
 │   └── reset.sh         # Reset helper
+├── screenshots/         # Demo screenshots
 ├── Dockerfile           # Container build
 ├── fly.toml            # Fly.io config
 └── README.md           # This file
 ```
+
+## Theme Support
+
+Toggle between light and dark modes using the button in the header.
+
+| Mode | Best For |
+|------|----------|
+| Dark | Default. Professional operator console feel, reduces eye strain |
+| Light | Presentations, screenshots, print-friendly |
+
+## Color System
+
+Strict semantic color usage throughout the UI:
+
+| Color | Usage |
+|-------|-------|
+| Blue | Navigation, selection states |
+| Green | Money out, success, positive amounts |
+| Red | Deductions, errors, irreversible actions |
+| Amber | Pending states, warnings, overtime hours |
+| Purple | AI features, analysis, demo mode indicators |
