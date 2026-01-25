@@ -31,8 +31,15 @@ Welcome to Payroll Engine documentation. Start here to find what you need.
 | Document | Purpose |
 |----------|---------|
 | [compat.md](compat.md) | Compatibility guarantees |
+| [roadmap.md](roadmap.md) | Planned work and non-goals |
 | [../CHANGELOG.md](../CHANGELOG.md) | Version history |
 | [../RELEASING.md](../RELEASING.md) | Release process |
+
+## Supply Chain
+
+| Document | Purpose |
+|----------|---------|
+| [supply_chain.md](supply_chain.md) | Verify release integrity |
 
 ## Safety
 
@@ -42,10 +49,18 @@ Welcome to Payroll Engine documentation. Start here to find what you need.
 | [threat_model.md](threat_model.md) | Security considerations |
 | [public_api.md](public_api.md) | AI advisory constraints (advisory-only) |
 
+## Press & Communications
+
+| Document | Purpose |
+|----------|---------|
+| [press/announcement.md](press/announcement.md) | Release announcement |
+| [press/one_pager.md](press/one_pager.md) | Executive summary |
+| [press/faq.md](press/faq.md) | Common questions |
+
 ## Quick Links
 
 - **Quickstart**: See [README.md](../README.md#quickstart)
 - **API Reference**: [public_api.md](public_api.md)
-- **Report a Bug**: [GitHub Issues](https://github.com/payroll-engine/payroll-engine/issues/new?template=bug_report.yml)
-- **Ask a Question**: [GitHub Discussions](https://github.com/payroll-engine/payroll-engine/discussions)
+- **Report a Bug**: [GitHub Issues](https://github.com/mcp-tool-shop/payroll-engine/issues/new?template=bug_report.yml)
+- **Ask a Question**: [GitHub Discussions](https://github.com/mcp-tool-shop/payroll-engine/discussions)
 - **Security Issues**: security@payroll-engine.com

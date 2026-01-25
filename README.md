@@ -196,6 +196,28 @@ ingest_result = psp.ingest_settlement_feed(records)
 | [docs/runbooks/](docs/runbooks/) | Operational procedures |
 | [docs/recipes/](docs/recipes/) | Integration examples |
 
+## API Stability Promise
+
+**Stable (will not break without major version):**
+- `payroll_engine.psp` - PSP facade and config
+- `payroll_engine.psp.providers` - Provider protocol
+- `payroll_engine.psp.events` - Domain events
+- `payroll_engine.psp.ai` - AI advisory (config and public types)
+
+**Internal (may change without notice):**
+- `payroll_engine.psp.services.*` - Implementation details
+- `payroll_engine.psp.ai.models.*` - Model internals
+- Anything with `_` prefix
+
+**AI Advisory constraints (enforced):**
+- Cannot move money
+- Cannot write ledger entries
+- Cannot override funding gates
+- Cannot make settlement decisions
+- Emits advisory events only
+
+See [docs/public_api.md](docs/public_api.md) for the full contract.
+
 ## Key Guarantees
 
 | Guarantee | Enforcement |
@@ -206,6 +228,7 @@ ingest_result = psp.ingest_settlement_feed(records)
 | Status only moves forward | Trigger validates transitions |
 | Events are immutable | Schema versioning in CI |
 | Pay gate cannot be bypassed | Enforced in facade |
+| AI cannot move money | Architectural constraint |
 
 ## CLI Tools
 
