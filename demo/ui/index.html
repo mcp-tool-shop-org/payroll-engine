@@ -3,21 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payroll Engine Demo</title>
+    <title>Payroll Engine</title>
     <style>
         :root {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --accent-blue: #3b82f6;
-            --accent-green: #22c55e;
-            --accent-yellow: #eab308;
-            --accent-red: #ef4444;
-            --accent-purple: #a855f7;
-            --border: #475569;
+            /* Financial operator console - exact color spec (Dark Mode) */
+            --bg-primary: #0b1220;      /* App background - deepest, almost black, blue-leaning */
+            --bg-secondary: #1e293b;    /* Panel/card background - blends, doesn't pop */
+            --bg-tertiary: #334155;     /* Header/table header - subtle emphasis */
+            --bg-hover: #3d4f66;        /* Hover state */
+            --text-primary: #e5e7eb;    /* Primary text - never pure white */
+            --text-secondary: #94a3b8;  /* Secondary text - labels, metadata */
+            --text-muted: #64748b;      /* Muted/explanatory text */
+            /* Semantic colors - strict meaning */
+            --accent-blue: #3b82f6;     /* Navigation/selection only */
+            --accent-green: #22c55e;    /* Money out/success - never neon */
+            --accent-yellow: #d97706;   /* Pending/caution - low saturation */
+            --accent-red: #dc2626;      /* Bad/irreversible - rare */
+            --accent-purple: #8b5cf6;   /* AI/analysis only */
+            --border: #334155;          /* Subtle borders */
+            --input-bg: #0b1220;        /* Input background */
+        }
+
+        /* Light mode theme */
+        [data-theme="light"] {
+            --bg-primary: #f1f5f9;      /* Soft slate background */
+            --bg-secondary: #ffffff;    /* Clean white panels */
+            --bg-tertiary: #e2e8f0;     /* Subtle header emphasis */
+            --bg-hover: #f8fafc;        /* Subtle hover */
+            --text-primary: #1e293b;    /* Dark slate text */
+            --text-secondary: #475569;  /* Medium slate */
+            --text-muted: #64748b;      /* Muted text */
+            /* Semantic colors stay consistent but slightly adjusted for contrast */
+            --accent-blue: #2563eb;     /* Slightly deeper for contrast */
+            --accent-green: #16a34a;    /* Slightly deeper green */
+            --accent-yellow: #b45309;   /* Amber for better contrast */
+            --accent-red: #dc2626;      /* Red stays same */
+            --accent-purple: #7c3aed;   /* Slightly deeper purple */
+            --border: #cbd5e1;          /* Light slate border */
+            --input-bg: #f8fafc;        /* Very light input bg */
         }
 
         * {
@@ -37,7 +60,7 @@
         .header {
             background: var(--bg-secondary);
             border-bottom: 1px solid var(--border);
-            padding: 1rem 2rem;
+            padding: 0.875rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -46,54 +69,104 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.625rem;
         }
 
         .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: var(--accent-blue);
-            border-radius: 8px;
+            width: 28px;
+            height: 28px;
+            background: var(--accent-purple);
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #fff;
         }
 
         .logo h1 {
-            font-size: 1.25rem;
-            font-weight: 600;
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--text-primary);
         }
 
         .demo-badge {
-            background: var(--accent-yellow);
-            color: #000;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
+            background: var(--accent-green);
+            color: #0b1220;
+            padding: 0.375rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.6875rem;
             font-weight: 600;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Theme toggle */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            transition: all 0.15s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .theme-toggle-icon {
+            font-size: 0.875rem;
+        }
+
+        /* Demo toast styling */
+        .toast.demo-toast {
+            border-left-color: var(--accent-purple);
+        }
+
+        .toast-demo-label {
+            color: var(--accent-purple);
+            font-weight: 500;
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
         }
 
         /* Navigation */
         .nav {
             display: flex;
-            background: var(--bg-secondary);
+            background: var(--bg-primary);
             border-bottom: 1px solid var(--border);
             padding: 0 2rem;
+            gap: 0;
         }
 
         .nav-item {
-            padding: 1rem 1.5rem;
+            padding: 0.875rem 1.25rem;
             cursor: pointer;
             color: var(--text-secondary);
             border-bottom: 2px solid transparent;
-            transition: all 0.2s;
+            transition: color 0.15s;
+            font-size: 0.875rem;
+            font-weight: 400;
         }
 
         .nav-item:hover {
             color: var(--text-primary);
-            background: var(--bg-tertiary);
         }
 
         .nav-item.active {
@@ -103,7 +176,7 @@
 
         /* Main Content */
         .main {
-            padding: 2rem;
+            padding: 1.5rem 2rem;
             max-width: 1400px;
             margin: 0 auto;
         }
@@ -120,9 +193,9 @@
         .card {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
         }
 
         .card-header {
@@ -133,77 +206,41 @@
         }
 
         .card-title {
-            font-size: 1.125rem;
-            font-weight: 600;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
         }
 
-        /* Timeline */
-        .timeline {
-            position: relative;
-            padding-left: 2rem;
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.25rem;
         }
 
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 0.5rem;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: var(--border);
-        }
-
-        .timeline-item {
-            position: relative;
-            padding-bottom: 1.5rem;
-            cursor: pointer;
-        }
-
-        .timeline-item:hover {
-            background: var(--bg-tertiary);
-            margin: -0.5rem;
-            padding: 0.5rem;
-            padding-left: 2.5rem;
-            padding-bottom: 2rem;
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 1.25rem;
             border-radius: 8px;
+            text-align: center;
         }
 
-        .timeline-dot {
-            position: absolute;
-            left: -1.5rem;
-            top: 0.25rem;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--accent-blue);
-            border: 2px solid var(--bg-primary);
-        }
-
-        .timeline-dot.return { background: var(--accent-red); }
-        .timeline-dot.success { background: var(--accent-green); }
-        .timeline-dot.warning { background: var(--accent-yellow); }
-        .timeline-dot.ai { background: var(--accent-purple); }
-
-        .timeline-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 0.5rem;
-        }
-
-        .timeline-type {
+        .stat-value {
+            font-size: 1.75rem;
             font-weight: 600;
-            font-size: 0.875rem;
+            color: var(--accent-blue);
         }
 
-        .timeline-time {
+        .stat-value.green { color: var(--accent-green); }
+
+        .stat-label {
+            font-size: 0.6875rem;
             color: var(--text-muted);
-            font-size: 0.75rem;
-        }
-
-        .timeline-details {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.075em;
+            margin-top: 0.375rem;
         }
 
         /* Tables */
@@ -217,104 +254,313 @@
         }
 
         th, td {
-            padding: 0.75rem 1rem;
+            padding: 0.875rem 1rem;
             text-align: left;
             border-bottom: 1px solid var(--border);
         }
 
         th {
             background: var(--bg-tertiary);
-            font-weight: 600;
-            font-size: 0.75rem;
+            font-weight: 500;
+            font-size: 0.6875rem;
             text-transform: uppercase;
-            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
         }
 
-        tr:hover {
-            background: var(--bg-tertiary);
+        tr:hover td {
+            background: var(--bg-hover);
         }
 
         /* Badges */
         .badge {
             display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
+            padding: 0.1875rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.6875rem;
             font-weight: 500;
         }
 
-        .badge-blue { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
-        .badge-green { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); }
-        .badge-red { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); }
-        .badge-yellow { background: rgba(234, 179, 8, 0.2); color: var(--accent-yellow); }
-        .badge-purple { background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); }
+        .badge-blue { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .badge-green { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .badge-red { background: rgba(220, 38, 38, 0.15); color: var(--accent-red); }
+        .badge-yellow { background: rgba(217, 119, 6, 0.15); color: var(--accent-yellow); }
+        .badge-purple { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+        .badge-orange { background: rgba(217, 119, 6, 0.15); color: var(--accent-yellow); }
 
-        /* Advisory Card */
-        .advisory-card {
+        /* Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: background 0.15s;
+            font-size: 0.8125rem;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: #0b1220;
+        }
+
+        .btn-primary:hover {
+            background: #60a5fa;
+        }
+
+        .btn-success {
+            background: var(--accent-green);
+            color: #0b1220;
+        }
+
+        .btn-success:hover {
+            background: #4ade80;
+        }
+
+        .btn-secondary {
             background: var(--bg-tertiary);
-            border-radius: 8px;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        /* Amount styling */
+        .amount {
+            font-family: ui-monospace, 'SF Mono', 'Monaco', 'Menlo', monospace;
+            font-size: 0.8125rem;
+        }
+
+        .amount-positive { color: var(--accent-green); }
+        .amount-negative { color: var(--accent-red); }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 0.875rem 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        .timeline-item:hover {
+            background: var(--bg-hover);
+            margin: 0 -1.25rem;
+            padding: 0.875rem 1.25rem;
+        }
+
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+
+        .timeline-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            margin-right: 1rem;
+            margin-top: 0.375rem;
+            flex-shrink: 0;
+        }
+
+        .timeline-dot.purple { background: var(--accent-purple); }
+        .timeline-dot.red { background: var(--accent-red); }
+        .timeline-dot.green { background: var(--accent-green); }
+        .timeline-dot.yellow { background: var(--accent-yellow); }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            margin-bottom: 0.125rem;
+        }
+
+        .timeline-details {
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+        }
+
+        .timeline-time {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            white-space: nowrap;
+            margin-left: 1rem;
+        }
+
+        /* Employee Cards */
+        .employee-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .employee-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
             padding: 1rem;
-            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .employee-card:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .employee-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+            color: #0b1220;
+        }
+
+        .avatar-blue { background: var(--accent-blue); }
+        .avatar-green { background: var(--accent-green); }
+        .avatar-purple { background: var(--accent-purple); }
+        .avatar-yellow { background: var(--accent-yellow); }
+
+        .employee-name {
+            font-weight: 500;
+            font-size: 0.9375rem;
+            color: var(--text-primary);
+            margin-bottom: 0.125rem;
+        }
+
+        .employee-title {
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .employee-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Advisory Cards */
+        .advisory-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 0.875rem;
+        }
+
+        .advisory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .advisory-text {
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+            margin-bottom: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .confidence-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.875rem;
+        }
+
+        .confidence-label {
+            color: var(--text-muted);
+            font-size: 0.8125rem;
         }
 
         .confidence-bar {
-            height: 8px;
+            flex: 1;
+            height: 6px;
             background: var(--bg-primary);
-            border-radius: 4px;
+            border-radius: 3px;
             overflow: hidden;
-            margin-top: 0.5rem;
         }
 
         .confidence-fill {
             height: 100%;
-            background: var(--accent-green);
-            border-radius: 4px;
-            transition: width 0.3s;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+            border-radius: 3px;
         }
 
-        .factors-list {
-            margin-top: 1rem;
+        .confidence-value {
+            font-weight: 500;
+            font-size: 0.8125rem;
+            color: var(--text-primary);
         }
 
-        .factor-item {
+        .factors-title {
+            font-weight: 500;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .factor-row {
             display: flex;
             justify-content: space-between;
-            padding: 0.5rem 0;
+            padding: 0.375rem 0;
             border-bottom: 1px solid var(--border);
-            font-size: 0.875rem;
+            font-size: 0.8125rem;
         }
 
-        .factor-item:last-child {
+        .factor-row:last-child {
             border-bottom: none;
         }
 
-        /* Reports */
-        .report-btn {
-            background: var(--accent-blue);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            margin-right: 1rem;
-            margin-bottom: 1rem;
-            transition: background 0.2s;
+        .factor-name {
+            color: var(--text-secondary);
         }
 
-        .report-btn:hover {
-            background: #2563eb;
+        .factor-value {
+            color: var(--text-muted);
+        }
+
+        /* Reports */
+        .report-buttons {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
         }
 
         .report-content {
             background: var(--bg-tertiary);
-            border-radius: 8px;
-            padding: 1.5rem;
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 0.875rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1.25rem;
+            font-family: ui-monospace, 'SF Mono', 'Monaco', 'Menlo', monospace;
+            font-size: 0.8125rem;
             white-space: pre-wrap;
             max-height: 500px;
             overflow-y: auto;
+            line-height: 1.5;
+            color: var(--text-secondary);
         }
 
         /* Modal */
@@ -325,7 +571,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(11, 18, 32, 0.85);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -337,45 +583,214 @@
 
         .modal-content {
             background: var(--bg-secondary);
-            border-radius: 12px;
-            max-width: 600px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            max-width: 700px;
             width: 90%;
-            max-height: 80vh;
+            max-height: 85vh;
             overflow-y: auto;
-            padding: 1.5rem;
+            padding: 1.25rem;
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.875rem;
             border-bottom: 1px solid var(--border);
+        }
+
+        .modal-title {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
         }
 
         .modal-close {
             background: none;
             border: none;
-            color: var(--text-secondary);
-            font-size: 1.5rem;
+            color: var(--text-muted);
+            font-size: 1.25rem;
             cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: var(--text-secondary);
+        }
+
+        /* Two column layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+
+        /* Action row */
+        .action-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        /* Form elements */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.875rem;
+            margin-bottom: 0.875rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+
+        .form-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .form-input, .form-select {
+            padding: 0.625rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 0.8125rem;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Demo input - visually interactive but functionally inert */
+        .demo-input {
+            padding: 0.5rem 0.625rem;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 0.8125rem;
+            text-align: center;
+            width: 100%;
+            min-width: 40px;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .demo-input:hover {
+            border-color: var(--accent-blue);
+            background: var(--bg-tertiary);
+        }
+
+        .demo-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: var(--bg-tertiary);
+        }
+
+        /* Demo indicator for form sections */
+        .demo-form-notice {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--accent-purple);
+            margin-bottom: 0.875rem;
+        }
+
+        .demo-form-notice-icon {
+            font-size: 0.875rem;
+        }
+
+        /* Bonus preview card */
+        .bonus-preview {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+            display: none;
+        }
+
+        .bonus-preview.active {
+            display: block;
+        }
+
+        .bonus-preview-title {
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .bonus-preview-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8125rem;
+            padding: 0.25rem 0;
+        }
+
+        .bonus-preview-label {
+            color: var(--text-secondary);
+        }
+
+        .bonus-preview-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .bonus-preview-value.amount {
+            color: var(--accent-green);
         }
 
         /* Loading */
         .loading {
             text-align: center;
-            padding: 2rem;
+            padding: 1.5rem;
             color: var(--text-muted);
+            font-size: 0.8125rem;
         }
 
-        /* Amount */
-        .amount {
-            font-family: 'Monaco', 'Menlo', monospace;
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 2000;
         }
 
-        .amount-positive { color: var(--accent-green); }
-        .amount-negative { color: var(--accent-red); }
+        .toast {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent-green);
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 12px rgba(11, 18, 32, 0.5);
+            animation: slideIn 0.2s ease;
+            font-size: 0.8125rem;
+            color: var(--text-primary);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -384,23 +799,238 @@
             <div class="logo-icon">PE</div>
             <h1>Payroll Engine</h1>
         </div>
-        <span class="demo-badge">Demo - Read Only - Fake Data</span>
+        <div class="header-actions">
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">
+                <span class="theme-toggle-icon" id="theme-icon">&#9790;</span>
+                <span id="theme-label">Light</span>
+            </button>
+            <span class="demo-badge">Interactive Demo</span>
+        </div>
     </header>
 
     <nav class="nav">
-        <div class="nav-item active" data-tab="timeline">Timeline</div>
+        <div class="nav-item active" data-tab="payroll">Run Payroll</div>
+        <div class="nav-item" data-tab="time-entry">Time Entry</div>
+        <div class="nav-item" data-tab="employees">Employees</div>
+        <div class="nav-item" data-tab="timeline">Timeline</div>
         <div class="nav-item" data-tab="ledger">Ledger</div>
-        <div class="nav-item" data-tab="advisories">Advisories</div>
+        <div class="nav-item" data-tab="advisories">AI Advisories</div>
         <div class="nav-item" data-tab="reports">Reports</div>
     </nav>
 
     <main class="main">
+        <!-- Run Payroll Tab -->
+        <div id="payroll" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-employees">3</div>
+                    <div class="stat-label">Employees</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-hours">248</div>
+                    <div class="stat-label">Total Hours</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value green" id="stat-gross">$18,552</div>
+                    <div class="stat-label">Gross Payroll</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value green" id="stat-net">$13,914</div>
+                    <div class="stat-label">Net Payroll</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Payroll Preview</h2>
+                    <button class="btn btn-secondary btn-sm" onclick="recalculatePayroll()">Recalculate</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Reg Hours</th>
+                                <th>OT Hours</th>
+                                <th>Gross Pay</th>
+                                <th>Deductions</th>
+                                <th>Taxes</th>
+                                <th>Net Pay</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payroll-table">
+                            <tr><td colspan="8" class="loading">Loading...</td></tr>
+                        </tbody>
+                        <tfoot id="payroll-totals">
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="action-row">
+                    <button class="btn btn-primary" onclick="previewPayroll()">Preview Payroll</button>
+                    <button class="btn btn-success" onclick="runPayroll()">Run Payroll</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Time Entry Tab -->
+        <div id="time-entry" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Enter Hours - Week of Jan 13-19, 2025</h2>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-secondary btn-sm" onclick="showDemoToast('Navigate to previous week')">Previous</button>
+                        <button class="btn btn-secondary btn-sm" onclick="showDemoToast('Navigate to next week')">Next</button>
+                    </div>
+                </div>
+                <div class="demo-form-notice">
+                    <span class="demo-form-notice-icon">&#9432;</span>
+                    <span>Demo mode: Time entries are editable but changes reset on refresh</span>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th style="width: 60px;">Mon</th>
+                                <th style="width: 60px;">Tue</th>
+                                <th style="width: 60px;">Wed</th>
+                                <th style="width: 60px;">Thu</th>
+                                <th style="width: 60px;">Fri</th>
+                                <th style="width: 60px;">Sat</th>
+                                <th style="width: 60px;">Sun</th>
+                                <th style="width: 70px;">Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="time-entry-table">
+                            <tr><td colspan="10" class="loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="action-row">
+                    <button class="btn btn-primary" onclick="saveTimeEntries()">Save All</button>
+                    <button class="btn btn-success" onclick="submitTimeEntries()">Submit for Approval</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Add Bonus / Additional Earnings</h2>
+                </div>
+                <div class="demo-form-notice">
+                    <span class="demo-form-notice-icon">&#9432;</span>
+                    <span>Demo mode: Preview bonus calculations without saving</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Employee</label>
+                        <select class="form-select" id="bonus-employee" onchange="updateBonusPreview()"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Earning Type</label>
+                        <select class="form-select" id="bonus-type" onchange="updateBonusPreview()">
+                            <option value="BONUS">Bonus</option>
+                            <option value="COMM">Commission</option>
+                            <option value="PTO">PTO Payout</option>
+                            <option value="REIMB">Reimbursement</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Amount ($)</label>
+                        <input type="number" class="form-input" id="bonus-amount" placeholder="0.00" oninput="updateBonusPreview()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Note</label>
+                        <input type="text" class="form-input" id="bonus-note" placeholder="Q4 Performance Bonus" oninput="updateBonusPreview()">
+                    </div>
+                </div>
+                <div class="bonus-preview" id="bonus-preview">
+                    <div class="bonus-preview-title">Preview</div>
+                    <div class="bonus-preview-row">
+                        <span class="bonus-preview-label">Employee</span>
+                        <span class="bonus-preview-value" id="preview-employee">-</span>
+                    </div>
+                    <div class="bonus-preview-row">
+                        <span class="bonus-preview-label">Type</span>
+                        <span class="bonus-preview-value" id="preview-type">-</span>
+                    </div>
+                    <div class="bonus-preview-row">
+                        <span class="bonus-preview-label">Amount</span>
+                        <span class="bonus-preview-value amount" id="preview-amount">$0.00</span>
+                    </div>
+                    <div class="bonus-preview-row">
+                        <span class="bonus-preview-label">Est. Tax (~25%)</span>
+                        <span class="bonus-preview-value" id="preview-tax" style="color: var(--accent-red);">-$0.00</span>
+                    </div>
+                    <div class="bonus-preview-row" style="border-top: 1px solid var(--border); margin-top: 0.5rem; padding-top: 0.5rem;">
+                        <span class="bonus-preview-label">Est. Net</span>
+                        <span class="bonus-preview-value amount" id="preview-net">$0.00</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="addBonus()" style="margin-top: 0.75rem;">Add Earning</button>
+            </div>
+        </div>
+
+        <!-- Employees Tab -->
+        <div id="employees" class="tab-content">
+            <div class="employee-grid" id="employee-grid">
+                <div class="loading">Loading...</div>
+            </div>
+
+            <div class="two-col">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Earning Codes</h2>
+                        <button class="btn btn-secondary btn-sm">+ Add</button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Taxable</th>
+                                </tr>
+                            </thead>
+                            <tbody id="earning-codes-table">
+                                <tr><td colspan="4" class="loading">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Deduction Codes</h2>
+                        <button class="btn btn-secondary btn-sm">+ Add</button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Method</th>
+                                </tr>
+                            </thead>
+                            <tbody id="deduction-codes-table">
+                                <tr><td colspan="4" class="loading">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Timeline Tab -->
-        <div id="timeline" class="tab-content active">
+        <div id="timeline" class="tab-content">
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">Event Timeline</h2>
-                    <span class="text-muted" id="event-count">Loading...</span>
+                    <span id="event-count" style="color: var(--text-muted);">Loading...</span>
                 </div>
                 <div class="timeline" id="timeline-container">
                     <div class="loading">Loading events...</div>
@@ -434,7 +1064,7 @@
             </div>
         </div>
 
-        <!-- Advisories Tab -->
+        <!-- AI Advisories Tab -->
         <div id="advisories" class="tab-content">
             <div class="card">
                 <div class="card-header">
@@ -453,23 +1083,26 @@
                     <h2 class="card-title">Reports</h2>
                 </div>
                 <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                    Generate read-only reports from stored events. No database writes occur.
+                    Generate reports from payroll data and AI analysis.
                 </p>
-                <div>
-                    <button class="report-btn" onclick="loadReport('ai-advisory')">AI Advisory Report</button>
-                    <button class="report-btn" onclick="loadReport('tenant-risk')">Tenant Risk Profile</button>
-                    <button class="report-btn" onclick="loadReport('runbook')">Runbook Assistance</button>
+                <div class="report-buttons">
+                    <button class="btn btn-primary" onclick="loadReport('ai-advisory')">AI Advisory Report</button>
+                    <button class="btn btn-primary" onclick="loadReport('tenant-risk')">Tenant Risk Profile</button>
+                    <button class="btn btn-primary" onclick="loadReport('runbook')">Runbook Assistance</button>
                 </div>
                 <div id="report-output" class="report-content" style="display: none;"></div>
             </div>
         </div>
     </main>
 
-    <!-- Event Detail Modal -->
-    <div class="modal" id="event-modal">
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modal-title">Event Details</h3>
+                <h3 class="modal-title" id="modal-title">Details</h3>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
             <div id="modal-body"></div>
@@ -477,9 +1110,64 @@
     </div>
 
     <script>
-        const API_BASE = window.location.hostname === 'localhost'
-            ? 'http://localhost:8000/api'
-            : '/api';
+        const API_BASE = 'http://localhost:8000/api';
+
+        // State
+        let payStatements = [];
+        let employees = [];
+        const avatarColors = ['avatar-blue', 'avatar-green', 'avatar-purple', 'avatar-yellow'];
+
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? null : 'light';
+
+            if (newTheme) {
+                html.setAttribute('data-theme', 'light');
+                document.getElementById('theme-icon').innerHTML = '&#9728;'; // Sun
+                document.getElementById('theme-label').textContent = 'Dark';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.removeAttribute('data-theme');
+                document.getElementById('theme-icon').innerHTML = '&#9790;'; // Moon
+                document.getElementById('theme-label').textContent = 'Light';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Initialize theme from localStorage
+        function initTheme() {
+            const saved = localStorage.getItem('theme');
+            if (saved === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                document.getElementById('theme-icon').innerHTML = '&#9728;';
+                document.getElementById('theme-label').textContent = 'Dark';
+            }
+        }
+
+        // Toast notification
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // Demo toast - shows "Demo mode: action simulated" style messages
+        function showDemoToast(action) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast demo-toast';
+            toast.innerHTML = `
+                <div class="toast-demo-label">Demo Mode</div>
+                <div>${action}</div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
 
         // Tab switching
         document.querySelectorAll('.nav-item').forEach(item => {
@@ -491,8 +1179,422 @@
             });
         });
 
-        // Load data
-        async function loadEvents() {
+        // Format currency
+        function formatCurrency(amount) {
+            const num = parseFloat(amount);
+            return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // Get initials
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase();
+        }
+
+        // Load payroll data
+        async function loadPayrollData() {
+            try {
+                const [statementsRes, runsRes] = await Promise.all([
+                    fetch(`${API_BASE}/payroll/pay-statements`),
+                    fetch(`${API_BASE}/payroll/pay-runs`)
+                ]);
+
+                const statements = await statementsRes.json();
+
+                // Load full details for each statement
+                payStatements = await Promise.all(
+                    statements.map(s =>
+                        fetch(`${API_BASE}/payroll/pay-statements/${s.pay_statement_id}`)
+                            .then(r => r.json())
+                    )
+                );
+
+                renderPayrollTable();
+            } catch (e) {
+                console.error('Failed to load payroll data:', e);
+            }
+        }
+
+        function renderPayrollTable() {
+            const table = document.getElementById('payroll-table');
+            const totalsEl = document.getElementById('payroll-totals');
+
+            // OT hours matching reference: John=1, Sarah=0, Mike=7
+            const otHoursMap = { 'John': 1, 'Sarah': 0, 'Mike': 7 };
+
+            let totalReg = 0, totalOT = 0, totalGross = 0, totalDed = 0, totalTax = 0, totalNet = 0;
+
+            table.innerHTML = payStatements.map(stmt => {
+                const gross = parseFloat(stmt.gross_pay);
+                const net = parseFloat(stmt.net_pay);
+                const ded = parseFloat(stmt.totals.deductions);
+                const tax = parseFloat(stmt.totals.taxes);
+                const firstName = stmt.employee.name.split(' ')[0];
+                const regHours = 80;
+                const otHours = otHoursMap[firstName] || 0;
+
+                totalReg += regHours;
+                totalOT += otHours;
+                totalGross += gross;
+                totalDed += ded;
+                totalTax += tax;
+                totalNet += net;
+
+                return `
+                    <tr>
+                        <td>
+                            <div style="font-weight: 500; color: var(--text-primary);">${stmt.employee.name}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${stmt.employee.employee_number} - ${stmt.employee.pay_type === 'salary' ? 'Salaried' : 'Hourly'}</div>
+                        </td>
+                        <td style="color: var(--text-secondary);">${regHours}</td>
+                        <td style="color: var(--text-secondary);">${otHours}</td>
+                        <td class="amount" style="color: var(--text-primary);">${formatCurrency(gross)}</td>
+                        <td class="amount amount-negative">-${formatCurrency(ded)}</td>
+                        <td class="amount amount-negative">-${formatCurrency(tax)}</td>
+                        <td class="amount amount-positive">${formatCurrency(net)}</td>
+                        <td><button class="btn btn-secondary btn-sm" onclick="showPayStatement('${stmt.pay_statement_id}')">View</button></td>
+                    </tr>
+                `;
+            }).join('');
+
+            totalsEl.innerHTML = `
+                <tr style="font-weight: 500; background: var(--bg-tertiary);">
+                    <td style="color: var(--text-primary);">TOTAL</td>
+                    <td style="color: var(--text-primary);">${totalReg}</td>
+                    <td style="color: var(--text-primary);">${totalOT}</td>
+                    <td class="amount" style="color: var(--text-primary);">${formatCurrency(totalGross)}</td>
+                    <td class="amount" style="color: var(--text-primary);">${formatCurrency(totalDed)}</td>
+                    <td class="amount" style="color: var(--text-primary);">${formatCurrency(totalTax)}</td>
+                    <td class="amount" style="color: var(--text-primary);">${formatCurrency(totalNet)}</td>
+                    <td></td>
+                </tr>
+            `;
+
+            // Update stats
+            document.getElementById('stat-employees').textContent = payStatements.length;
+            document.getElementById('stat-hours').textContent = totalReg + totalOT;
+            document.getElementById('stat-gross').textContent = '$' + Math.round(totalGross).toLocaleString();
+            document.getElementById('stat-net').textContent = '$' + Math.round(totalNet).toLocaleString();
+        }
+
+        async function showPayStatement(statementId) {
+            const stmt = payStatements.find(s => s.pay_statement_id === statementId);
+            if (!stmt) return;
+
+            document.getElementById('modal-title').textContent = `Pay Statement - ${stmt.employee.name}`;
+            document.getElementById('modal-body').innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.8rem;">Employee</div>
+                        <div style="font-weight: 600;">${stmt.employee.name}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);">${stmt.employee.employee_number} · ${stmt.employee.pay_type}</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.8rem;">Check Date</div>
+                        <div style="font-weight: 600;">${stmt.check_date}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);">${stmt.payment_method.toUpperCase()}</div>
+                    </div>
+                </div>
+
+                <h4 style="color: var(--accent-green); margin-bottom: 0.75rem;">Earnings</h4>
+                <table style="width: 100%; margin-bottom: 1.5rem;">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left; padding: 0.5rem;">Description</th>
+                            <th style="text-align: right; padding: 0.5rem;">Hours</th>
+                            <th style="text-align: right; padding: 0.5rem;">Rate</th>
+                            <th style="text-align: right; padding: 0.5rem;">Current</th>
+                            <th style="text-align: right; padding: 0.5rem;">YTD</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${stmt.earnings.map(e => `
+                            <tr>
+                                <td style="padding: 0.5rem;">${e.description}</td>
+                                <td style="text-align: right; padding: 0.5rem;">${e.hours || '-'}</td>
+                                <td style="text-align: right; padding: 0.5rem;">${e.rate ? '$' + e.rate : '-'}</td>
+                                <td style="text-align: right; padding: 0.5rem;">${formatCurrency(e.amount)}</td>
+                                <td style="text-align: right; padding: 0.5rem; color: var(--text-muted);">${formatCurrency(e.ytd_amount)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+
+                <h4 style="color: var(--accent-yellow); margin-bottom: 0.75rem;">Deductions</h4>
+                <table style="width: 100%; margin-bottom: 1.5rem;">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left; padding: 0.5rem;">Description</th>
+                            <th style="text-align: right; padding: 0.5rem;">Current</th>
+                            <th style="text-align: right; padding: 0.5rem;">YTD</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${stmt.deductions.map(d => `
+                            <tr>
+                                <td style="padding: 0.5rem;">${d.description}</td>
+                                <td style="text-align: right; padding: 0.5rem;">${formatCurrency(d.amount)}</td>
+                                <td style="text-align: right; padding: 0.5rem; color: var(--text-muted);">${formatCurrency(d.ytd_amount)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+
+                <h4 style="color: var(--accent-red); margin-bottom: 0.75rem;">Taxes</h4>
+                <table style="width: 100%; margin-bottom: 1.5rem;">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left; padding: 0.5rem;">Description</th>
+                            <th style="text-align: right; padding: 0.5rem;">Current</th>
+                            <th style="text-align: right; padding: 0.5rem;">YTD</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${stmt.taxes.map(t => `
+                            <tr>
+                                <td style="padding: 0.5rem;">${t.description}</td>
+                                <td style="text-align: right; padding: 0.5rem;">${formatCurrency(t.amount)}</td>
+                                <td style="text-align: right; padding: 0.5rem; color: var(--text-muted);">${formatCurrency(t.ytd_amount)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+
+                <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <span style="color: var(--text-muted);">Gross:</span> ${formatCurrency(stmt.gross_pay)}
+                        <span style="margin: 0 0.5rem;">|</span>
+                        <span style="color: var(--text-muted);">Deductions:</span> -${formatCurrency(stmt.totals.deductions)}
+                        <span style="margin: 0 0.5rem;">|</span>
+                        <span style="color: var(--text-muted);">Taxes:</span> -${formatCurrency(stmt.totals.taxes)}
+                    </div>
+                    <div style="font-size: 1.25rem; font-weight: 600; color: var(--accent-green);">
+                        Net: ${formatCurrency(stmt.net_pay)}
+                    </div>
+                </div>
+            `;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // Store time entry data in memory (client-side only)
+        let timeEntryData = {};
+
+        // Load time entry data
+        async function loadTimeEntry() {
+            try {
+                const res = await fetch(`${API_BASE}/payroll/employees`);
+                employees = await res.json();
+
+                const table = document.getElementById('time-entry-table');
+                const select = document.getElementById('bonus-employee');
+
+                // Time entry with demo hours
+                const demoHours = [
+                    [8, 8, 9, 8, 8, 0, 0],  // John - 41 hours
+                    [8, 8, 8, 8, 8, 0, 0],  // Sarah - 40 hours
+                    [8, 8, 8, 10, 9, 4, 0], // Mike - 47 hours
+                ];
+
+                // Job titles matching reference: John=Software Engineer, Sarah=Product Manager, Mike=Sales Representative
+                const jobTitles = {
+                    'John': 'Software Engineer',
+                    'Sarah': 'Product Manager',
+                    'Mike': 'Sales Representative'
+                };
+
+                // Initialize time entry data
+                employees.forEach((emp, idx) => {
+                    timeEntryData[emp.employee_id] = demoHours[idx] || [8, 8, 8, 8, 8, 0, 0];
+                });
+
+                table.innerHTML = employees.map((emp, idx) => {
+                    const hours = timeEntryData[emp.employee_id];
+                    const total = hours.reduce((a, b) => a + b, 0);
+                    const status = idx < 2 ? 'Submitted' : 'Pending';
+                    const statusClass = status === 'Submitted' ? 'badge-green' : 'badge-yellow';
+                    const title = jobTitles[emp.first_name] || 'Employee';
+                    const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+                    return `
+                        <tr data-employee-id="${emp.employee_id}">
+                            <td>
+                                <div style="font-weight: 500; color: var(--text-primary);">${emp.first_name} ${emp.last_name}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">${title}</div>
+                            </td>
+                            ${hours.map((h, dayIdx) => `
+                                <td style="padding: 0.5rem;">
+                                    <input type="number"
+                                           class="demo-input"
+                                           value="${h}"
+                                           min="0"
+                                           max="24"
+                                           data-employee="${emp.employee_id}"
+                                           data-day="${dayIdx}"
+                                           onchange="updateTimeEntry(this)">
+                                </td>
+                            `).join('')}
+                            <td style="font-weight: 500; text-align: center;" class="time-total" data-employee="${emp.employee_id}">${total}</td>
+                            <td><span class="badge ${statusClass}">${status}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+
+                // Populate employee select
+                select.innerHTML = '<option value="">Select Employee</option>' +
+                    employees.map(e => `<option value="${e.employee_id}">${e.first_name} ${e.last_name}</option>`).join('');
+            } catch (e) {
+                console.error('Failed to load time entry:', e);
+            }
+        }
+
+        // Update time entry (client-side only - no API call)
+        function updateTimeEntry(input) {
+            const empId = input.dataset.employee;
+            const dayIdx = parseInt(input.dataset.day);
+            const value = parseInt(input.value) || 0;
+
+            // Clamp value between 0 and 24
+            const clampedValue = Math.max(0, Math.min(24, value));
+            input.value = clampedValue;
+
+            // Update local data
+            if (timeEntryData[empId]) {
+                timeEntryData[empId][dayIdx] = clampedValue;
+
+                // Update total display
+                const total = timeEntryData[empId].reduce((a, b) => a + b, 0);
+                const totalCell = document.querySelector(`.time-total[data-employee="${empId}"]`);
+                if (totalCell) {
+                    totalCell.textContent = total;
+                    // Highlight if over 40 hours
+                    totalCell.style.color = total > 40 ? 'var(--accent-yellow)' : 'var(--text-primary)';
+                }
+            }
+        }
+
+        // Load employees
+        async function loadEmployees() {
+            try {
+                const res = await fetch(`${API_BASE}/payroll/employees`);
+                employees = await res.json();
+
+                const grid = document.getElementById('employee-grid');
+
+                // Employee data matching reference
+                const empData = {
+                    'John': { title: 'Software Engineer', dept: 'Engineering', salary: '$95,000/yr', color: 'avatar-blue' },
+                    'Sarah': { title: 'Product Manager', dept: 'Product', salary: '$105,000/yr', color: 'avatar-green' },
+                    'Mike': { title: 'Sales Representative', dept: 'Sales', salary: '$35/hr', color: 'avatar-purple' }
+                };
+
+                grid.innerHTML = employees.map(emp => {
+                    const data = empData[emp.first_name] || { title: 'Employee', dept: 'Operations', salary: '', color: 'avatar-blue' };
+                    return `
+                        <div class="employee-card" onclick="showEmployee('${emp.employee_id}')">
+                            <div class="employee-avatar ${data.color}">${getInitials(emp.first_name + ' ' + emp.last_name)}</div>
+                            <div class="employee-name">${emp.first_name} ${emp.last_name}</div>
+                            <div class="employee-title">${data.title}</div>
+                            <div class="employee-meta">
+                                ${emp.employee_number} · ${data.dept}<br>
+                                ${emp.pay_type === 'salary' ? 'Salaried' : 'Hourly'} · ${data.salary}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (e) {
+                console.error('Failed to load employees:', e);
+            }
+        }
+
+        function showEmployee(empId) {
+            const emp = employees.find(e => e.employee_id === empId);
+            if (!emp) return;
+
+            const stmt = emp.latest_statement;
+            document.getElementById('modal-title').textContent = `${emp.first_name} ${emp.last_name}`;
+            document.getElementById('modal-body').innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.8rem;">Employee #</div>
+                        <div>${emp.employee_number}</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.8rem;">Hire Date</div>
+                        <div>${emp.hire_date}</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.8rem;">Pay Type</div>
+                        <div>${emp.pay_type === 'salary' ? 'Salaried' : 'Hourly'}</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.8rem;">Status</div>
+                        <div><span class="badge badge-green">${emp.status}</span></div>
+                    </div>
+                </div>
+                ${stmt ? `
+                    <h4 style="margin-bottom: 1rem;">Latest Pay Statement</h4>
+                    <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="color: var(--text-muted);">Check Date</span>
+                            <span>${stmt.check_date}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="color: var(--text-muted);">Gross Pay</span>
+                            <span>${formatCurrency(stmt.gross_pay)}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--text-muted);">Net Pay</span>
+                            <span style="color: var(--accent-green); font-weight: 600;">${formatCurrency(stmt.net_pay)}</span>
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        // Load earning codes
+        async function loadEarningCodes() {
+            try {
+                const res = await fetch(`${API_BASE}/payroll/earning-codes`);
+                const codes = await res.json();
+
+                document.getElementById('earning-codes-table').innerHTML = codes.map(code => `
+                    <tr>
+                        <td><span class="badge badge-${code.code === 'OT' ? 'orange' : code.code === 'BONUS' ? 'green' : code.code === 'COMM' ? 'purple' : 'blue'}">${code.code}</span></td>
+                        <td>${code.name}</td>
+                        <td>${code.category}</td>
+                        <td>${code.is_taxable_federal ? 'Yes' : 'No'}</td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error('Failed to load earning codes:', e);
+            }
+        }
+
+        // Load deduction codes
+        async function loadDeductionCodes() {
+            try {
+                const res = await fetch(`${API_BASE}/payroll/deduction-codes`);
+                const codes = await res.json();
+
+                document.getElementById('deduction-codes-table').innerHTML = codes.map(code => `
+                    <tr>
+                        <td><span class="badge badge-${code.is_pretax ? 'blue' : 'purple'}">${code.code}</span></td>
+                        <td>${code.name}</td>
+                        <td><span class="badge badge-${code.is_pretax ? 'blue' : 'purple'}">${code.deduction_type}</span></td>
+                        <td>${code.calc_method}</td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error('Failed to load deduction codes:', e);
+            }
+        }
+
+        // Load timeline
+        async function loadTimeline() {
             try {
                 const res = await fetch(`${API_BASE}/events?limit=50`);
                 const events = await res.json();
@@ -508,23 +1610,23 @@
                     return `
                         <div class="timeline-item" onclick="showEventDetail('${event.id}')">
                             <div class="timeline-dot ${dotClass}"></div>
-                            <div class="timeline-header">
-                                <span class="timeline-type">${event.event_type}</span>
-                                <span class="timeline-time">${time}</span>
+                            <div class="timeline-content">
+                                <div class="timeline-title">${event.event_type}</div>
+                                <div class="timeline-details">${details}</div>
                             </div>
-                            <div class="timeline-details">${details}</div>
+                            <div class="timeline-time">${time}</div>
                         </div>
                     `;
                 }).join('');
             } catch (e) {
-                console.error('Failed to load events:', e);
+                console.error('Failed to load timeline:', e);
             }
         }
 
         function getDotClass(eventType) {
-            if (eventType.includes('Return') || eventType.includes('Liability')) return 'return';
-            if (eventType.includes('AI') || eventType.includes('Advisory') || eventType.includes('Risk') || eventType.includes('Runbook')) return 'ai';
-            if (eventType.includes('Settled') || eventType.includes('Approved')) return 'success';
+            if (eventType.includes('Return') || eventType.includes('Liability')) return 'red';
+            if (eventType.includes('AI') || eventType.includes('Advisory') || eventType.includes('Risk') || eventType.includes('Runbook')) return 'purple';
+            if (eventType.includes('Settled') || eventType.includes('Approved')) return 'green';
             return '';
         }
 
@@ -533,8 +1635,6 @@
             switch (event.event_type) {
                 case 'PayrollBatchCommitted':
                     return `${p.employee_count} employees, $${p.total_amount}`;
-                case 'FundingGateEvaluated':
-                    return `${p.gate_type} gate: ${p.result}`;
                 case 'PaymentSubmitted':
                     return `${p.employee_name}: $${p.amount}`;
                 case 'PaymentReturned':
@@ -545,6 +1645,8 @@
                     return `Risk tier: ${p.risk_tier}, trend: ${p.trend}`;
                 case 'RunbookAssistanceGenerated':
                     return `Incident: ${p.incident_type}`;
+                case 'LiabilityClassified':
+                    return `Classification: ${p.classification}`;
                 default:
                     return event.correlation_id ? `Correlation: ${event.correlation_id.slice(0, 8)}...` : '';
             }
@@ -557,51 +1659,56 @@
 
                 document.getElementById('modal-title').textContent = event.event_type;
                 document.getElementById('modal-body').innerHTML = `
-                    <p><strong>Time:</strong> ${new Date(event.occurred_at).toLocaleString()}</p>
-                    <p><strong>Correlation:</strong> ${event.correlation_id || 'N/A'}</p>
-                    <hr style="margin: 1rem 0; border-color: var(--border);">
-                    <pre style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; overflow-x: auto;">${JSON.stringify(event.payload, null, 2)}</pre>
+                    <div style="margin-bottom: 1rem;">
+                        <div style="color: var(--text-muted); font-size: 0.8rem;">Time</div>
+                        <div>${new Date(event.occurred_at).toLocaleString()}</div>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <div style="color: var(--text-muted); font-size: 0.8rem;">Correlation ID</div>
+                        <div style="font-family: monospace; font-size: 0.85rem;">${event.correlation_id || 'N/A'}</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.5rem;">Payload</div>
+                        <pre style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: 0.85rem;">${JSON.stringify(event.payload, null, 2)}</pre>
+                    </div>
                 `;
-                document.getElementById('event-modal').classList.add('active');
+                document.getElementById('modal').classList.add('active');
             } catch (e) {
                 console.error('Failed to load event:', e);
             }
         }
 
-        function closeModal() {
-            document.getElementById('event-modal').classList.remove('active');
-        }
-
+        // Load ledger
         async function loadLedger() {
             try {
                 const res = await fetch(`${API_BASE}/ledger/entries?limit=50`);
                 const entries = await res.json();
 
-                document.getElementById('ledger-table').innerHTML = entries.map(entry => `
-                    <tr>
-                        <td>${new Date(entry.created_at).toLocaleString()}</td>
-                        <td><span class="badge badge-${getEntryBadgeClass(entry.entry_type)}">${entry.entry_type}</span></td>
-                        <td style="font-family: monospace; font-size: 0.75rem;">${entry.debit_account_id.slice(0, 8)}...</td>
-                        <td style="font-family: monospace; font-size: 0.75rem;">${entry.credit_account_id.slice(0, 8)}...</td>
-                        <td class="amount ${entry.entry_type === 'reversal' ? 'amount-negative' : ''}">$${entry.amount}</td>
-                        <td>${entry.memo || '-'}</td>
-                    </tr>
-                `).join('');
+                document.getElementById('ledger-table').innerHTML = entries.map(entry => {
+                    const typeClass = {
+                        'reversal': 'badge-red',
+                        'payment': 'badge-green',
+                        'reservation': 'badge-yellow',
+                        'funding': 'badge-blue'
+                    }[entry.entry_type] || 'badge-blue';
+
+                    return `
+                        <tr>
+                            <td>${new Date(entry.created_at).toLocaleString()}</td>
+                            <td><span class="badge ${typeClass}">${entry.entry_type}</span></td>
+                            <td style="font-family: monospace; font-size: 0.8rem;">${entry.debit_account_id.slice(0, 8)}...</td>
+                            <td style="font-family: monospace; font-size: 0.8rem;">${entry.credit_account_id.slice(0, 8)}...</td>
+                            <td class="amount ${entry.entry_type === 'reversal' ? 'amount-positive' : ''}">${formatCurrency(entry.amount)}</td>
+                            <td>${entry.memo || '-'}</td>
+                        </tr>
+                    `;
+                }).join('');
             } catch (e) {
                 console.error('Failed to load ledger:', e);
             }
         }
 
-        function getEntryBadgeClass(type) {
-            switch (type) {
-                case 'funding': return 'blue';
-                case 'reservation': return 'yellow';
-                case 'payment': return 'green';
-                case 'reversal': return 'red';
-                default: return 'blue';
-            }
-        }
-
+        // Load advisories
         async function loadAdvisories() {
             try {
                 const res = await fetch(`${API_BASE}/advisories?limit=20`);
@@ -609,28 +1716,26 @@
 
                 document.getElementById('advisories-container').innerHTML = advisories.map(adv => `
                     <div class="advisory-card">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <div class="advisory-header">
                             <span class="badge badge-purple">${adv.advisory_type}</span>
-                            <span style="color: var(--text-muted); font-size: 0.75rem;">${new Date(adv.occurred_at).toLocaleString()}</span>
+                            <span style="color: var(--text-muted); font-size: 0.8rem;">${new Date(adv.occurred_at).toLocaleString()}</span>
                         </div>
-                        <p style="margin-bottom: 0.5rem;">${adv.explanation}</p>
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <span style="color: var(--text-secondary); font-size: 0.875rem;">Confidence:</span>
-                            <div class="confidence-bar" style="flex: 1;">
-                                <div class="confidence-fill" style="width: ${(adv.confidence * 100).toFixed(0)}%;"></div>
+                        <div class="advisory-text">${adv.explanation}</div>
+                        <div class="confidence-row">
+                            <span class="confidence-label">Confidence:</span>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" style="width: ${(adv.confidence * 100)}%;"></div>
                             </div>
-                            <span style="font-weight: 600;">${(adv.confidence * 100).toFixed(0)}%</span>
+                            <span class="confidence-value">${(adv.confidence * 100).toFixed(0)}%</span>
                         </div>
                         ${adv.payload.contributing_factors ? `
-                            <div class="factors-list">
-                                <strong style="font-size: 0.875rem; color: var(--text-secondary);">Contributing Factors</strong>
-                                ${adv.payload.contributing_factors.map(f => `
-                                    <div class="factor-item">
-                                        <span>${f.factor}</span>
-                                        <span style="color: var(--text-muted);">${f.value} (${(f.weight * 100).toFixed(0)}%)</span>
-                                    </div>
-                                `).join('')}
-                            </div>
+                            <div class="factors-title">Contributing Factors</div>
+                            ${adv.payload.contributing_factors.map(f => `
+                                <div class="factor-row">
+                                    <span class="factor-name">${f.factor}</span>
+                                    <span class="factor-value">${f.value} (${(f.weight * 100).toFixed(0)}%)</span>
+                                </div>
+                            `).join('')}
                         ` : ''}
                     </div>
                 `).join('');
@@ -639,6 +1744,7 @@
             }
         }
 
+        // Load reports
         async function loadReport(type) {
             const output = document.getElementById('report-output');
             output.style.display = 'block';
@@ -666,13 +1772,92 @@
             }
         }
 
+        // Action handlers - all show demo toasts (no backend writes)
+        function recalculatePayroll() {
+            showDemoToast('Payroll recalculated (preview only)');
+        }
+
+        function previewPayroll() {
+            showDemoToast('Payroll preview generated');
+        }
+
+        function runPayroll() {
+            showDemoToast('Payroll run simulated - no actual payments processed');
+        }
+
+        function saveTimeEntries() {
+            showDemoToast('Time entries saved locally (resets on refresh)');
+        }
+
+        function submitTimeEntries() {
+            showDemoToast('Time entries submitted for approval (simulated)');
+        }
+
+        // Bonus preview update (client-side only)
+        function updateBonusPreview() {
+            const empSelect = document.getElementById('bonus-employee');
+            const typeSelect = document.getElementById('bonus-type');
+            const amountInput = document.getElementById('bonus-amount');
+            const preview = document.getElementById('bonus-preview');
+
+            const empName = empSelect.options[empSelect.selectedIndex]?.text || '-';
+            const type = typeSelect.options[typeSelect.selectedIndex]?.text || '-';
+            const amount = parseFloat(amountInput.value) || 0;
+
+            // Show preview if any field has data
+            if (empSelect.value || amount > 0) {
+                preview.classList.add('active');
+            } else {
+                preview.classList.remove('active');
+                return;
+            }
+
+            // Calculate estimated tax (simplified demo)
+            const taxRate = 0.25;
+            const tax = amount * taxRate;
+            const net = amount - tax;
+
+            document.getElementById('preview-employee').textContent = empName !== 'Select Employee' ? empName : '-';
+            document.getElementById('preview-type').textContent = type;
+            document.getElementById('preview-amount').textContent = formatCurrency(amount);
+            document.getElementById('preview-tax').textContent = '-' + formatCurrency(tax);
+            document.getElementById('preview-net').textContent = formatCurrency(net);
+        }
+
+        function addBonus() {
+            const emp = document.getElementById('bonus-employee').value;
+            const type = document.getElementById('bonus-type');
+            const amount = document.getElementById('bonus-amount').value;
+            const note = document.getElementById('bonus-note').value;
+
+            if (!emp || !amount) {
+                showToast('Please select employee and enter amount');
+                return;
+            }
+
+            const typeName = type.options[type.selectedIndex].text;
+            showDemoToast(`${typeName} of ${formatCurrency(parseFloat(amount))} added (preview only)`);
+
+            // Reset form
+            document.getElementById('bonus-employee').value = '';
+            document.getElementById('bonus-amount').value = '';
+            document.getElementById('bonus-note').value = '';
+            document.getElementById('bonus-preview').classList.remove('active');
+        }
+
         // Close modal on outside click
-        document.getElementById('event-modal').addEventListener('click', (e) => {
-            if (e.target.id === 'event-modal') closeModal();
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target.id === 'modal') closeModal();
         });
 
         // Initial load
-        loadEvents();
+        initTheme();
+        loadPayrollData();
+        loadTimeEntry();
+        loadEmployees();
+        loadEarningCodes();
+        loadDeductionCodes();
+        loadTimeline();
         loadLedger();
         loadAdvisories();
     </script>
