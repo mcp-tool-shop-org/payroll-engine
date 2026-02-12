@@ -11,11 +11,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
-COPY pyproject.toml .
+COPY pyproject.toml README.md ./
 COPY src/ src/
 
-# Install the package and demo dependencies
-RUN pip install --no-cache-dir -e . \
+# Install build deps, then the package and demo dependencies
+RUN pip install --no-cache-dir setuptools wheel hatchling \
+    && pip install --no-cache-dir . \
     && pip install --no-cache-dir \
         fastapi \
         uvicorn[standard] \
