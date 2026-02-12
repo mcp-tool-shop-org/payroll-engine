@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "payroll-engine"
-version = "0.1.0"
+version = "0.1.1"
 description = "US Payroll SaaS Engine with PSP - ledger, payment rails, settlement, and liability management"
 readme = "README.md"
 license = "MIT"
@@ -115,11 +115,11 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/payroll-engine/payroll-engine"
-Documentation = "https://github.com/payroll-engine/payroll-engine/tree/main/docs"
-Repository = "https://github.com/payroll-engine/payroll-engine"
-Issues = "https://github.com/payroll-engine/payroll-engine/issues"
-Changelog = "https://github.com/payroll-engine/payroll-engine/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/mcp-tool-shop-org/payroll-engine"
+Documentation = "https://github.com/mcp-tool-shop-org/payroll-engine/tree/main/docs"
+Repository = "https://github.com/mcp-tool-shop-org/payroll-engine"
+Issues = "https://github.com/mcp-tool-shop-org/payroll-engine/issues"
+Changelog = "https://github.com/mcp-tool-shop-org/payroll-engine/blob/main/CHANGELOG.md"
 
 [project.scripts]
 psp = "payroll_engine.psp.cli:main"
