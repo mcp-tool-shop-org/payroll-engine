@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "payroll-engine"
-version = "0.1.1"
+version = "0.1.2"
 description = "US Payroll SaaS Engine with PSP - ledger, payment rails, settlement, and liability management"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
 authors = [
-    { name = "Payroll Engine Team" }
+    { name = "mcp-tool-shop", email = "64996768+mcp-tool-shop@users.noreply.github.com" }
 ]
 keywords = [
     "payroll",
