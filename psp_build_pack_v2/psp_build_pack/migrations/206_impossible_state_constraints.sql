@@ -29,16 +29,18 @@ ALTER TABLE psp_ledger_entry
     ADD CONSTRAINT chk_ledger_entry_type_valid
     CHECK (entry_type IN (
         'funding_received',
-        'funding_withdrawal',
-        'payment_debit',
-        'payment_credit',
-        'fee_charged',
-        'fee_refund',
-        'reversal',
-        'adjustment',
-        'interest_credit',
-        'hold_placed',
-        'hold_released'
+        'funding_returned',
+        'reserve_created',
+        'reserve_released',
+        'employee_payment_initiated',
+        'employee_payment_settled',
+        'employee_payment_failed',
+        'tax_payment_initiated',
+        'tax_payment_settled',
+        'third_party_payment_initiated',
+        'third_party_payment_settled',
+        'fee_assessed',
+        'reversal'
     ));
 
 -- =============================================================================
@@ -65,12 +67,13 @@ ALTER TABLE payment_instruction
 ALTER TABLE payment_instruction
     ADD CONSTRAINT chk_payment_instruction_status_valid
     CHECK (status IN (
-        'pending',
+        'created',
+        'queued',
         'submitted',
         'accepted',
         'settled',
         'failed',
-        'returned',
+        'reversed',
         'canceled'
     ));
 
@@ -81,14 +84,11 @@ ALTER TABLE payment_instruction
     ADD CONSTRAINT chk_payment_instruction_purpose_valid
     CHECK (purpose IN (
         'employee_net',
-        'employee_expense',
-        'vendor_payment',
-        'tax_payment',
-        'garnishment',
-        'child_support',
-        'fee_payment',
+        'tax_remit',
+        'third_party',
         'refund',
-        'correction'
+        'fee',
+        'funding_debit'
     ));
 
 -- Payee type must be valid
@@ -98,20 +98,12 @@ ALTER TABLE payment_instruction
     ADD CONSTRAINT chk_payment_instruction_payee_type_valid
     CHECK (payee_type IN (
         'employee',
-        'vendor',
-        'tax_authority',
-        'garnishment_agency',
-        'internal_account'
+        'agency',
+        'provider',
+        'client'
     ));
 
--- =============================================================================
--- PAYMENT ATTEMPT UNIQUENESS
--- =============================================================================
-
--- Provider + provider_request_id must be unique (prevents duplicate submissions)
-CREATE UNIQUE INDEX IF NOT EXISTS idx_payment_attempt_provider_request_unique
-    ON payment_attempt (provider, provider_request_id)
-    WHERE provider_request_id IS NOT NULL;
+-- Payment attempt uniqueness already enforced by payment_attempt_provider_uq in 202
 
 -- =============================================================================
 -- SETTLEMENT EVENT CONSTRAINTS
@@ -137,19 +129,15 @@ ALTER TABLE psp_settlement_event
 ALTER TABLE psp_settlement_event
     ADD CONSTRAINT chk_settlement_status_valid
     CHECK (status IN (
-        'pending',
+        'created',
         'submitted',
         'accepted',
         'settled',
-        'returned',
-        'rejected',
-        'canceled'
+        'failed',
+        'reversed'
     ));
 
--- External trace ID must be unique per provider (prevents duplicate imports)
-CREATE UNIQUE INDEX IF NOT EXISTS idx_settlement_external_trace_unique
-    ON psp_settlement_event (rail, external_trace_id)
-    WHERE external_trace_id IS NOT NULL;
+-- External trace uniqueness already enforced by psp_settlement_event_trace_uq in 201
 
 -- =============================================================================
 -- STATUS TRANSITION CONSTRAINTS
@@ -161,12 +149,13 @@ CREATE OR REPLACE FUNCTION validate_payment_instruction_status_transition()
 RETURNS TRIGGER AS $$
 DECLARE
     valid_transitions JSONB := '{
-        "pending": ["submitted", "canceled"],
+        "created": ["queued", "submitted", "canceled"],
+        "queued": ["submitted", "canceled"],
         "submitted": ["accepted", "failed", "canceled"],
-        "accepted": ["settled", "failed", "returned"],
-        "settled": ["returned"],
+        "accepted": ["settled", "failed", "reversed"],
+        "settled": ["reversed"],
         "failed": [],
-        "returned": [],
+        "reversed": [],
         "canceled": []
     }'::JSONB;
     allowed_targets JSONB;
@@ -200,13 +189,12 @@ CREATE OR REPLACE FUNCTION validate_settlement_status_transition()
 RETURNS TRIGGER AS $$
 DECLARE
     valid_transitions JSONB := '{
-        "pending": ["submitted", "accepted", "settled", "rejected", "canceled"],
-        "submitted": ["accepted", "settled", "rejected"],
-        "accepted": ["settled", "returned", "rejected"],
-        "settled": ["returned"],
-        "returned": [],
-        "rejected": [],
-        "canceled": []
+        "created": ["submitted", "accepted", "settled", "failed"],
+        "submitted": ["accepted", "settled", "failed"],
+        "accepted": ["settled", "failed", "reversed"],
+        "settled": ["reversed"],
+        "failed": [],
+        "reversed": []
     }'::JSONB;
     allowed_targets JSONB;
 BEGIN
@@ -297,44 +285,42 @@ CREATE TRIGGER trg_link_reversal
 -- =============================================================================
 
 -- Amount must be positive
-ALTER TABLE psp_balance_reservation
+ALTER TABLE psp_reservation
     DROP CONSTRAINT IF EXISTS chk_reservation_amount_positive;
-ALTER TABLE psp_balance_reservation
+ALTER TABLE psp_reservation
     ADD CONSTRAINT chk_reservation_amount_positive
     CHECK (amount > 0);
 
 -- Status must be valid
-ALTER TABLE psp_balance_reservation
+ALTER TABLE psp_reservation
     DROP CONSTRAINT IF EXISTS chk_reservation_status_valid;
-ALTER TABLE psp_balance_reservation
+ALTER TABLE psp_reservation
     ADD CONSTRAINT chk_reservation_status_valid
-    CHECK (status IN ('active', 'consumed', 'expired', 'released'));
-
--- Expires_at must be in the future when created
--- (Can't enforce easily with CHECK, but documented here)
+    CHECK (status IN ('active', 'consumed', 'released'));
 
 -- =============================================================================
 -- FUNDING REQUEST CONSTRAINTS
 -- =============================================================================
 
 -- Amount must be positive
-ALTER TABLE psp_funding_request
+ALTER TABLE funding_request
     DROP CONSTRAINT IF EXISTS chk_funding_request_amount_positive;
-ALTER TABLE psp_funding_request
+ALTER TABLE funding_request
     ADD CONSTRAINT chk_funding_request_amount_positive
     CHECK (amount > 0);
 
 -- Status must be valid
-ALTER TABLE psp_funding_request
+ALTER TABLE funding_request
     DROP CONSTRAINT IF EXISTS chk_funding_request_status_valid;
-ALTER TABLE psp_funding_request
+ALTER TABLE funding_request
     ADD CONSTRAINT chk_funding_request_status_valid
     CHECK (status IN (
-        'pending',
-        'approved',
-        'blocked',
-        'partially_funded',
-        'funded',
+        'created',
+        'submitted',
+        'accepted',
+        'settled',
+        'failed',
+        'returned',
         'canceled'
     ));
 
@@ -347,7 +333,7 @@ ALTER TABLE liability_event
     DROP CONSTRAINT IF EXISTS chk_liability_amount_positive;
 ALTER TABLE liability_event
     ADD CONSTRAINT chk_liability_amount_positive
-    CHECK (amount > 0);
+    CHECK (loss_amount > 0);
 
 -- Recovery status must be valid
 ALTER TABLE liability_event
@@ -357,10 +343,10 @@ ALTER TABLE liability_event
     CHECK (recovery_status IN (
         'pending',
         'in_progress',
-        'recovered',
         'partial',
-        'written_off',
-        'disputed'
+        'complete',
+        'failed',
+        'written_off'
     ));
 
 -- =============================================================================
@@ -379,8 +365,3 @@ COMMENT ON INDEX idx_ledger_entry_reversed_once IS
 COMMENT ON TRIGGER trg_validate_payment_status_transition ON payment_instruction IS
     'INVARIANT: Payment status can only progress forward through valid state machine.';
 
-COMMENT ON INDEX idx_payment_attempt_provider_request_unique IS
-    'INVARIANT: Provider request IDs must be unique to prevent duplicate submission attacks.';
-
-COMMENT ON INDEX idx_settlement_external_trace_unique IS
-    'INVARIANT: External trace IDs must be unique per rail to prevent duplicate settlement imports.';

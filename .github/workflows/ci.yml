@@ -3,12 +3,37 @@ name: CI
 on:
   push:
     branches: [main, develop]
+    paths:
+      - "pyproject.toml"
+      - "src/**"
+      - "tests/**"
+      - "psp_build_pack_v2/**"
+      - "migrations/**"
+      - "scripts/**"
+      - "examples/**"
+      - "event_schema.json"
+      - ".github/workflows/**"
   pull_request:
     branches: [main, develop]
+    paths:
+      - "pyproject.toml"
+      - "src/**"
+      - "tests/**"
+      - "psp_build_pack_v2/**"
+      - "migrations/**"
+      - "scripts/**"
+      - "examples/**"
+      - "event_schema.json"
+      - ".github/workflows/**"
+  workflow_dispatch:
 
 env:
   PYTHON_VERSION: "3.11"
   DATABASE_URL: postgresql://payroll:payroll_dev@localhost:5432/payroll_dev
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   # ===========================================================================
