@@ -58,7 +58,13 @@ def get_applied_migrations(engine) -> set[int]:
 
 
 def apply_migration(engine, filepath: Path, migration_num: int, dry_run: bool) -> bool:
-    """Apply a single migration file."""
+    """Apply a single migration file.
+
+    Uses raw DBAPI execution to avoid psycopg2 interpreting percent signs
+    in PL/pgSQL code (e.g., %ROWTYPE, RAISE EXCEPTION 'foo % bar').
+    SQLAlchemy's text() would pass SQL through psycopg2's parameter
+    formatter, which chokes on bare % characters in PL/pgSQL functions.
+    """
     print(f"  Applying: {filepath.name}")
 
     sql_content = filepath.read_text(encoding="utf-8")
@@ -69,10 +75,16 @@ def apply_migration(engine, filepath: Path, migration_num: int, dry_run: bool) -
 
     try:
         with engine.connect() as conn:
-            # Execute the migration
-            conn.execute(text(sql_content))
+            # Use raw DBAPI connection to execute migration SQL.
+            # This bypasses psycopg2's parameter formatting so that
+            # PL/pgSQL percent signs (e.g., %ROWTYPE, 'Subscription % not found')
+            # are passed through verbatim to PostgreSQL.
+            dbapi_conn = conn.connection.dbapi_connection
+            cursor = dbapi_conn.cursor()
+            cursor.execute(sql_content)
+            cursor.close()
 
-            # Record in history
+            # Record in history (this uses text() which is safe — no % in this SQL)
             conn.execute(
                 text("""
                     INSERT INTO psp_migration_history (migration_number, filename)
