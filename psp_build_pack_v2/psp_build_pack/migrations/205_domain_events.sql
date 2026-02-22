@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS psp_domain_event (
     causation_id UUID,             -- Event that caused this one
 
     -- Timing
-    timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    "timestamp" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     -- Full event payload (for replay)
     payload JSONB NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS psp_domain_event (
 
 -- Tenant + time for replay queries
 CREATE INDEX IF NOT EXISTS idx_psp_domain_event_tenant_time
-    ON psp_domain_event (tenant_id, timestamp);
+    ON psp_domain_event (tenant_id, "timestamp");
 
 -- Correlation for related event queries
 CREATE INDEX IF NOT EXISTS idx_psp_domain_event_correlation
@@ -144,7 +144,7 @@ RETURNS TABLE (
     tenant_id UUID,
     correlation_id UUID,
     causation_id UUID,
-    timestamp TIMESTAMPTZ,
+    "timestamp" TIMESTAMPTZ,
     payload JSONB,
     version INT
 ) AS $$
@@ -164,18 +164,18 @@ BEGIN
     -- Return events after last processed
     RETURN QUERY
     SELECT e.event_id, e.event_type, e.category, e.tenant_id,
-           e.correlation_id, e.causation_id, e.timestamp,
+           e.correlation_id, e.causation_id, e."timestamp",
            e.payload, e.version
     FROM psp_domain_event e
     WHERE (v_subscription.last_event_timestamp IS NULL
-           OR e.timestamp > v_subscription.last_event_timestamp)
+           OR e."timestamp" > v_subscription.last_event_timestamp)
       AND (v_subscription.event_types IS NULL
            OR e.event_type = ANY(v_subscription.event_types))
       AND (v_subscription.categories IS NULL
            OR e.category = ANY(v_subscription.categories))
       AND (v_subscription.tenant_ids IS NULL
            OR e.tenant_id = ANY(v_subscription.tenant_ids))
-    ORDER BY e.timestamp ASC
+    ORDER BY e."timestamp" ASC
     LIMIT p_limit;
 END;
 $$ LANGUAGE plpgsql;
