@@ -198,7 +198,7 @@ DECLARE
         "created": ["queued", "pending", "submitted", "canceled"],
         "queued": ["submitted", "canceled"],
         "pending": ["submitted", "canceled"],
-        "submitted": ["accepted", "failed", "canceled"],
+        "submitted": ["accepted", "settled", "failed", "canceled"],
         "accepted": ["settled", "failed", "returned", "reversed"],
         "settled": ["returned", "reversed"],
         "failed": [],
