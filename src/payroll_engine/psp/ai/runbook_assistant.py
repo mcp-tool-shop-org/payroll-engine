@@ -26,10 +26,9 @@ SECURITY GUARANTEE - NO SQL EXECUTION:
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Optional
 from uuid import UUID, uuid4
 
 
@@ -110,7 +109,7 @@ class RunbookStep:
     action: str
     details: str
     is_completed: bool = False
-    notes: Optional[str] = None
+    notes: str | None = None
 
     def to_dict(self) -> dict:
         """Convert to dictionary."""
@@ -136,11 +135,11 @@ class IncidentContext:
     tenant_id: UUID
 
     # Incident details (varies by type)
-    amount: Optional[Decimal] = None
-    payment_id: Optional[UUID] = None
-    batch_id: Optional[UUID] = None
-    return_code: Optional[str] = None
-    mismatch_amount: Optional[Decimal] = None
+    amount: Decimal | None = None
+    payment_id: UUID | None = None
+    batch_id: UUID | None = None
+    return_code: str | None = None
+    mismatch_amount: Decimal | None = None
 
     # Additional context
     description: str = ""
@@ -215,24 +214,24 @@ class RunbookAssistance:
         """
         lines = [
             f"# Runbook Assistance: {self.runbook_name}",
-            f"",
+            "",
             f"**Incident ID:** {self.incident_id}",
             f"**Type:** {self.incident_type.value}",
             f"**Generated:** {self.generated_at.isoformat()}",
-            f"",
-            f"## Summary",
-            f"",
+            "",
+            "## Summary",
+            "",
             f"{self.summary}",
-            f"",
+            "",
             f"**Estimated Severity:** {self.estimated_severity}",
             f"**Estimated Resolution:** {self.estimated_resolution_time}",
-            f"",
+            "",
         ]
 
         if self.warnings:
             lines.extend([
-                f"## ⚠️ Warnings",
-                f"",
+                "## ⚠️ Warnings",
+                "",
             ])
             for w in self.warnings:
                 lines.append(f"- {w}")
@@ -240,23 +239,23 @@ class RunbookAssistance:
 
         if self.likely_causes:
             lines.extend([
-                f"## Likely Causes",
-                f"",
+                "## Likely Causes",
+                "",
             ])
             causes_to_show = self.likely_causes[:max_causes] if max_causes > 0 else self.likely_causes
             for i, cause in enumerate(causes_to_show, 1):
                 lines.extend([
                     f"### {i}. {cause.cause} ({cause.probability} probability)",
-                    f"",
-                    f"**Evidence for:**",
+                    "",
+                    "**Evidence for:**",
                 ])
                 for e in cause.evidence_for[:5]:  # Max 5 evidence items
                     lines.append(f"- [+] {e}")
                 if len(cause.evidence_for) > 5:
                     lines.append(f"- ... and {len(cause.evidence_for) - 5} more")
                 if cause.evidence_against:
-                    lines.append(f"")
-                    lines.append(f"**Evidence against:**")
+                    lines.append("")
+                    lines.append("**Evidence against:**")
                     for e in cause.evidence_against[:5]:
                         lines.append(f"- [-] {e}")
                     if len(cause.evidence_against) > 5:
@@ -269,26 +268,26 @@ class RunbookAssistance:
 
         if self.diagnostic_queries:
             lines.extend([
-                f"## Diagnostic Queries",
-                f"",
-                f"Run these queries to gather evidence (assistant suggests only, NEVER executes):",
-                f"",
+                "## Diagnostic Queries",
+                "",
+                "Run these queries to gather evidence (assistant suggests only, NEVER executes):",
+                "",
             ])
             queries_to_show = self.diagnostic_queries[:max_queries] if max_queries > 0 else self.diagnostic_queries
             for q in queries_to_show:
                 lines.extend([
                     f"### {q.name}",
-                    f"",
+                    "",
                     f"{q.description}",
-                    f"",
-                    f"```sql",
+                    "",
+                    "```sql",
                     f"{q.query_sql}",
-                    f"```",
-                    f"",
+                    "```",
+                    "",
                     f"**Expected:** {q.expected_outcome}",
-                    f"",
+                    "",
                     f"**If anomalous:** {q.if_anomalous}",
-                    f"",
+                    "",
                 ])
             if max_queries > 0 and len(self.diagnostic_queries) > max_queries:
                 remaining = len(self.diagnostic_queries) - max_queries
@@ -297,8 +296,8 @@ class RunbookAssistance:
 
         if self.recommended_steps:
             lines.extend([
-                f"## Recommended Steps",
-                f"",
+                "## Recommended Steps",
+                "",
             ])
             for step in self.recommended_steps:
                 checkbox = "☑" if step.is_completed else "☐"
@@ -307,11 +306,11 @@ class RunbookAssistance:
                 lines.append("")
 
         lines.extend([
-            f"---",
-            f"",
+            "---",
+            "",
             f"**Runbook:** `{self.runbook_path}`",
-            f"",
-            f"*This is AI-generated guidance. Always verify before taking action.*",
+            "",
+            "*This is AI-generated guidance. Always verify before taking action.*",
         ])
 
         return "\n".join(lines)

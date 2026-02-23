@@ -16,18 +16,16 @@ IMPORTANT: Rules-based models are NOT probabilistic.
 Confidence scores have CEILINGS to prevent overconfidence.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from decimal import Decimal
-from typing import Optional
 
-from payroll_engine.psp.ai.features import ReturnFeatures, FundingRiskFeatures
 from payroll_engine.psp.ai.base import ContributingFactor
+from payroll_engine.psp.ai.features import FundingRiskFeatures, ReturnFeatures
 from payroll_engine.psp.ai.return_codes import (
-    get_return_code_info,
-    get_ambiguity_confidence_penalty,
     ReturnCodeInfo,
+    get_ambiguity_confidence_penalty,
+    get_return_code_info,
 )
-
 
 # =============================================================================
 # Confidence Calibration

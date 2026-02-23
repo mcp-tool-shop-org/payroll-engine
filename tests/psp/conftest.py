@@ -2,19 +2,15 @@
 
 import asyncio
 from collections.abc import AsyncGenerator, Generator
-from decimal import Decimal
-from typing import Any
 from uuid import UUID, uuid4
 
 import pytest
 import pytest_asyncio
-from sqlalchemy import text
+from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import Session
-from sqlalchemy import create_engine
 
 from payroll_engine.config import settings
-
 
 # Test database URLs
 TEST_DATABASE_URL_ASYNC = settings.database_url.replace("payroll_dev", "payroll_test")

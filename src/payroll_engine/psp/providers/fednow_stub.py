@@ -94,7 +94,7 @@ class FedNowStubProvider:
         self._submitted[provider_request_id] = {
             "instruction": instruction,
             "message_id": message_id,
-            "submitted_at": datetime.datetime.now(datetime.timezone.utc),
+            "submitted_at": datetime.datetime.now(datetime.UTC),
             "settlement_date": settlement_date,
             "status": "settled" if self.auto_settle else "accepted",
         }

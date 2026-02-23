@@ -14,8 +14,8 @@ from uuid import uuid4
 import pytest
 
 from payroll_engine.psp.providers.ach_stub import AchStubProvider
-from payroll_engine.psp.providers.fednow_stub import FedNowStubProvider
 from payroll_engine.psp.providers.base import RailCapabilities
+from payroll_engine.psp.providers.fednow_stub import FedNowStubProvider
 
 
 class TestAchStubProvider:

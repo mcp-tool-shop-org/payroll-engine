@@ -18,10 +18,10 @@ CRITICAL: This is read-only analysis. It NEVER modifies state.
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 from uuid import UUID, uuid4
 
 
@@ -53,7 +53,7 @@ class RiskSignal:
     weight: float  # 0-1, contribution to risk score
     category: str  # return, funding, settlement, pattern
     description: str
-    trend: Optional[TrendDirection] = None
+    trend: TrendDirection | None = None
     threshold_exceeded: bool = False
 
     def to_dict(self) -> dict:
@@ -198,38 +198,38 @@ class TenantRiskProfile:
         }
 
         lines = [
-            f"# Tenant Risk Profile",
-            f"",
+            "# Tenant Risk Profile",
+            "",
             f"**Tenant:** {self.tenant_id}",
             f"**Generated:** {self.generated_at.isoformat()}",
             f"**Period:** Last {self.evaluation_period_days} days",
-            f"",
-            f"## Overall Assessment",
-            f"",
+            "",
+            "## Overall Assessment",
+            "",
             f"{emoji[self.risk_level]} **Risk Level:** {self.risk_level.value.upper()}",
-            f"",
+            "",
             f"**Risk Score:** {self.risk_score:.0%}",
-            f"",
+            "",
             f"**Trend:** {self.risk_trend.value}",
-            f"",
-            f"## Component Scores",
-            f"",
-            f"| Component | Score | Level |",
-            f"|-----------|-------|-------|",
+            "",
+            "## Component Scores",
+            "",
+            "| Component | Score | Level |",
+            "|-----------|-------|-------|",
             f"| Return Risk | {self.return_risk_score:.0%} | {self._score_level(self.return_risk_score)} |",
             f"| Reversal Risk | {self.reversal_risk_score:.0%} | {self._score_level(self.reversal_risk_score)} |",
             f"| Funding Risk | {self.funding_risk_score:.0%} | {self._score_level(self.funding_risk_score)} |",
             f"| Settlement Risk | {self.settlement_risk_score:.0%} | {self._score_level(self.settlement_risk_score)} |",
             f"| Pattern Risk | {self.pattern_risk_score:.0%} | {self._score_level(self.pattern_risk_score)} |",
-            f"",
+            "",
         ]
 
         if self.requires_immediate_action:
             lines.extend([
-                f"## ⚠️ IMMEDIATE ACTION REQUIRED",
-                f"",
-                f"This tenant requires immediate review due to critical risk indicators.",
-                f"",
+                "## ⚠️ IMMEDIATE ACTION REQUIRED",
+                "",
+                "This tenant requires immediate review due to critical risk indicators.",
+                "",
             ])
 
         if self.signals:
@@ -239,8 +239,8 @@ class TenantRiskProfile:
 
             if critical_signals:
                 lines.extend([
-                    f"## Critical Signals",
-                    f"",
+                    "## Critical Signals",
+                    "",
                 ])
                 for s in critical_signals:
                     trend_str = f" ({s.trend.value})" if s.trend else ""
@@ -249,8 +249,8 @@ class TenantRiskProfile:
 
             if other_signals:
                 lines.extend([
-                    f"## Other Signals",
-                    f"",
+                    "## Other Signals",
+                    "",
                 ])
                 for s in other_signals[:5]:  # Limit to top 5
                     lines.append(f"- {s.name}: {s.value} - {s.description}")
@@ -258,8 +258,8 @@ class TenantRiskProfile:
 
         if self.recommendations:
             lines.extend([
-                f"## Recommendations",
-                f"",
+                "## Recommendations",
+                "",
             ])
             for r in self.recommendations:
                 lines.append(f"- {r}")
@@ -503,7 +503,7 @@ class TenantRiskProfiler:
                 value=f"{metrics.reversal_rate_30d:.1%}",
                 weight=0.4,
                 category="reversal",
-                description=f"Reversal rate elevated",
+                description="Reversal rate elevated",
                 threshold_exceeded=False,
             ))
 
@@ -546,7 +546,7 @@ class TenantRiskProfiler:
                 value=metrics.funding_block_count_30d,
                 weight=0.4,
                 category="funding",
-                description=f"Recent funding block(s)",
+                description="Recent funding block(s)",
                 threshold_exceeded=False,
             ))
 

@@ -10,15 +10,16 @@ The event store provides:
 from __future__ import annotations
 
 import json
+from collections.abc import Iterator
 from dataclasses import dataclass
-from datetime import datetime, date
+from datetime import date, datetime
 from decimal import Decimal
-from typing import Any, Iterator
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import text
-from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from payroll_engine.psp.events.types import DomainEvent, EventCategory
 

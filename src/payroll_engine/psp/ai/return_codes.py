@@ -16,7 +16,6 @@ provides:
 """
 
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass(frozen=True)
@@ -29,7 +28,7 @@ class ReturnCodeInfo:
     confidence_ceiling: float  # Max confidence for rules-based model
     category: str  # account, authorization, processing, administrative, other
     recommended_actions: tuple[str, ...]
-    notes: Optional[str] = None
+    notes: str | None = None
 
 
 # =============================================================================

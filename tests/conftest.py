@@ -3,13 +3,12 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import AsyncGenerator
 from datetime import date, datetime, timedelta
 from decimal import Decimal
-from typing import AsyncGenerator
 from uuid import uuid4
 
 import pytest
-from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from payroll_engine.models import (
@@ -25,11 +24,11 @@ from payroll_engine.models import (
     LegalEntity,
     PayPeriod,
     PayRate,
+    PayrollRule,
+    PayrollRuleVersion,
     PayRun,
     PayRunEmployee,
     PaySchedule,
-    PayrollRule,
-    PayrollRuleVersion,
     Person,
     Tenant,
     TimeEntry,

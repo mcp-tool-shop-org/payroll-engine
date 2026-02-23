@@ -10,7 +10,6 @@ Tests verify:
 from decimal import Decimal
 from uuid import uuid4
 
-import pytest
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 

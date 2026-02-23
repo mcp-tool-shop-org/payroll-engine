@@ -3,10 +3,8 @@
 Goal: Cannot mutate payroll artifacts after commit.
 """
 
-import pytest
-from decimal import Decimal
-from uuid import UUID
 
+import pytest
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,7 +14,6 @@ from payroll_engine.services.locking_service import LockingService
 from payroll_engine.services.state_machine import PayRunStateMachine
 
 from .conftest import DRAFT_PAY_RUN_ID
-
 
 pytestmark = pytest.mark.asyncio
 

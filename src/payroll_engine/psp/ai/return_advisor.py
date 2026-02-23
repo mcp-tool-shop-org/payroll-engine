@@ -14,14 +14,12 @@ It only reads events and emits advisory recommendations.
 
 from dataclasses import dataclass
 from datetime import datetime
-from decimal import Decimal
-from typing import Optional
 from uuid import UUID, uuid4
 
 from payroll_engine.psp.ai.base import (
     AdvisoryConfig,
-    ReturnAdvisory,
     ContributingFactor,
+    ReturnAdvisory,
 )
 from payroll_engine.psp.ai.features import (
     FeatureExtractor,
@@ -53,7 +51,7 @@ class ReturnAdvisor:
         self,
         config: AdvisoryConfig,
         event_store,
-        feature_extractor: Optional[FeatureExtractor] = None,
+        feature_extractor: FeatureExtractor | None = None,
     ):
         """
         Initialize return advisor.
@@ -98,8 +96,8 @@ class ReturnAdvisor:
         tenant_id: UUID,
         payment_id: UUID,
         return_code: str,
-        return_date: Optional[datetime] = None,
-    ) -> Optional[ReturnAdvisory]:
+        return_date: datetime | None = None,
+    ) -> ReturnAdvisory | None:
         """
         Analyze a payment return and generate an advisory.
 
@@ -228,6 +226,6 @@ class ReturnAdvisor:
 @dataclass
 class ReturnAdvisoryResult:
     """Result of return advisory analysis."""
-    advisory: Optional[ReturnAdvisory]
+    advisory: ReturnAdvisory | None
     features: ReturnFeatures
     raw_scores: dict[str, float]

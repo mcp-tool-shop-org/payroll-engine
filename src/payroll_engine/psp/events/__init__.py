@@ -7,52 +7,52 @@ This package provides:
 - Event handlers for routing
 """
 
+from payroll_engine.psp.events.emitter import (
+    AsyncEventEmitter,
+    AsyncEventHandler,
+    EventEmitter,
+    EventHandler,
+)
+from payroll_engine.psp.events.store import (
+    AsyncEventStore,
+    EventStore,
+    StoredEvent,
+)
 from payroll_engine.psp.events.types import (
     # Base
     DomainEvent,
-    EventMetadata,
     EventCategory,
-    # Funding Events
-    FundingRequested,
+    EventMetadata,
     FundingApproved,
     FundingBlocked,
     FundingInsufficientFunds,
-    # Payment Events
-    PaymentInstructionCreated,
-    PaymentSubmitted,
-    PaymentAccepted,
-    PaymentSettled,
-    PaymentFailed,
-    PaymentReturned,
-    PaymentCanceled,
+    # Funding Events
+    FundingRequested,
     # Ledger Events
     LedgerEntryPosted,
     LedgerEntryReversed,
-    # Settlement Events
-    SettlementReceived,
-    SettlementMatched,
-    SettlementUnmatched,
-    SettlementStatusChanged,
     # Liability Events
     LiabilityClassified,
-    LiabilityRecoveryStarted,
     LiabilityRecovered,
+    LiabilityRecoveryStarted,
     LiabilityWrittenOff,
-    # Reconciliation Events
-    ReconciliationStarted,
+    PaymentAccepted,
+    PaymentCanceled,
+    PaymentFailed,
+    # Payment Events
+    PaymentInstructionCreated,
+    PaymentReturned,
+    PaymentSettled,
+    PaymentSubmitted,
     ReconciliationCompleted,
     ReconciliationFailed,
-)
-from payroll_engine.psp.events.emitter import (
-    EventEmitter,
-    AsyncEventEmitter,
-    EventHandler,
-    AsyncEventHandler,
-)
-from payroll_engine.psp.events.store import (
-    EventStore,
-    AsyncEventStore,
-    StoredEvent,
+    # Reconciliation Events
+    ReconciliationStarted,
+    SettlementMatched,
+    # Settlement Events
+    SettlementReceived,
+    SettlementStatusChanged,
+    SettlementUnmatched,
 )
 
 __all__ = [

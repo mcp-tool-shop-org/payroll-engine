@@ -3,17 +3,14 @@
 Tests the tax calculation logic with mocked dependencies.
 """
 
-import pytest
 from decimal import Decimal
-from datetime import date
 from uuid import uuid4
 
 from payroll_engine.calculators.tax_calculator import TaxCalculator
 from payroll_engine.calculators.types import (
+    TaxableWages,
     TaxBracket,
     TaxRule,
-    TaxableWages,
-    LineType,
 )
 
 

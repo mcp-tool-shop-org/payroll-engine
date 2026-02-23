@@ -19,9 +19,9 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections.abc import Callable
 from datetime import datetime
-from decimal import Decimal
-from typing import Any, Callable
+from typing import Any
 from uuid import UUID
 
 # Note: Actual DB session would come from your app's configuration

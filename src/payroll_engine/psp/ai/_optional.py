@@ -13,7 +13,6 @@ This module handles:
 IMPORTANT: rules_baseline model works WITHOUT any extras.
 """
 
-from typing import TYPE_CHECKING
 
 # Track which AI tiers are available
 _ML_DEPS_AVAILABLE: bool | None = None
@@ -56,8 +55,8 @@ def check_ml_deps_installed() -> bool:
 
     try:
         # Check for ML dependencies when we add them:
-        # import numpy  # noqa: F401
-        # import sklearn  # noqa: F401
+        # import numpy
+        # import sklearn
         #
         # For now, no ML models exist yet, so this is always False
         # to demonstrate the pattern. Flip to True when ML deps are added.
@@ -124,5 +123,3 @@ def is_ml_available() -> bool:
 
 
 # For type checking only - these are lazily imported at runtime
-if TYPE_CHECKING:
-    from payroll_engine.psp.ai.base import AdvisoryConfig

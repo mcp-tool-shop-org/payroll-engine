@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from datetime import date, datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import (
@@ -25,18 +25,14 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Numeric,
-    String,
     Text,
     UniqueConstraint,
 )
-from sqlalchemy.dialects.postgresql import JSONB, UUID as PGUUID
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from payroll_engine.models.base import Base
-
-if TYPE_CHECKING:
-    from payroll_engine.models.company import LegalEntity, Tenant
-    from payroll_engine.models.payroll import PayRun, PayStatement
 
 
 class PspBankAccount(Base):
@@ -69,7 +65,7 @@ class PspBankAccount(Base):
     )
 
     # Relationships
-    settlement_events: Mapped[list["PspSettlementEvent"]] = relationship(
+    settlement_events: Mapped[list[PspSettlementEvent]] = relationship(
         "PspSettlementEvent", back_populates="bank_account"
     )
 
@@ -115,12 +111,12 @@ class PspLedgerAccount(Base):
     )
 
     # Relationships
-    debit_entries: Mapped[list["PspLedgerEntry"]] = relationship(
+    debit_entries: Mapped[list[PspLedgerEntry]] = relationship(
         "PspLedgerEntry",
         foreign_keys="PspLedgerEntry.debit_account_id",
         back_populates="debit_account",
     )
-    credit_entries: Mapped[list["PspLedgerEntry"]] = relationship(
+    credit_entries: Mapped[list[PspLedgerEntry]] = relationship(
         "PspLedgerEntry",
         foreign_keys="PspLedgerEntry.credit_account_id",
         back_populates="credit_account",
@@ -189,17 +185,17 @@ class PspLedgerEntry(Base):
     )
 
     # Relationships
-    debit_account: Mapped["PspLedgerAccount"] = relationship(
+    debit_account: Mapped[PspLedgerAccount] = relationship(
         "PspLedgerAccount",
         foreign_keys=[debit_account_id],
         back_populates="debit_entries",
     )
-    credit_account: Mapped["PspLedgerAccount"] = relationship(
+    credit_account: Mapped[PspLedgerAccount] = relationship(
         "PspLedgerAccount",
         foreign_keys=[credit_account_id],
         back_populates="credit_entries",
     )
-    settlement_links: Mapped[list["PspSettlementLink"]] = relationship(
+    settlement_links: Mapped[list[PspSettlementLink]] = relationship(
         "PspSettlementLink", back_populates="ledger_entry"
     )
 
@@ -292,10 +288,10 @@ class PspSettlementEvent(Base):
     )
 
     # Relationships
-    bank_account: Mapped["PspBankAccount"] = relationship(
+    bank_account: Mapped[PspBankAccount] = relationship(
         "PspBankAccount", back_populates="settlement_events"
     )
-    links: Mapped[list["PspSettlementLink"]] = relationship(
+    links: Mapped[list[PspSettlementLink]] = relationship(
         "PspSettlementLink", back_populates="settlement_event"
     )
 
@@ -330,10 +326,10 @@ class PspSettlementLink(Base):
     )
 
     # Relationships
-    settlement_event: Mapped["PspSettlementEvent"] = relationship(
+    settlement_event: Mapped[PspSettlementEvent] = relationship(
         "PspSettlementEvent", back_populates="links"
     )
-    ledger_entry: Mapped["PspLedgerEntry"] = relationship(
+    ledger_entry: Mapped[PspLedgerEntry] = relationship(
         "PspLedgerEntry", back_populates="settlement_links"
     )
 

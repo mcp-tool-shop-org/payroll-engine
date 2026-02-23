@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import select
@@ -16,11 +15,7 @@ from payroll_engine.models import (
     PaymentBatchItem,
     PayRun,
     PayRunEmployee,
-    PayStatement,
 )
-
-if TYPE_CHECKING:
-    pass
 
 
 class PaymentService:

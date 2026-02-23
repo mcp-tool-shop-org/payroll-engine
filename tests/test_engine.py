@@ -3,21 +3,19 @@
 Tests the engine logic with mocked dependencies.
 """
 
-import pytest
-from decimal import Decimal
 from datetime import date
+from decimal import Decimal
 from uuid import uuid4
 
 from payroll_engine.calculators.engine import (
-    PayrollEngine,
     CalculationResult,
+    PayrollEngine,
     PayRunCalculationResult,
 )
 from payroll_engine.calculators.types import (
     EmployeeCalculationContext,
     LineCandidate,
     LineType,
-    TaxableWages,
 )
 
 

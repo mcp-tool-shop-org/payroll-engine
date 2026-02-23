@@ -6,14 +6,14 @@ utilities for generating human-readable explanations from
 model outputs and contributing factors.
 """
 
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Sequence
 
 from payroll_engine.psp.ai.base import (
     Advisory,
-    ReturnAdvisory,
-    FundingRiskAdvisory,
     ContributingFactor,
+    FundingRiskAdvisory,
+    ReturnAdvisory,
 )
 
 

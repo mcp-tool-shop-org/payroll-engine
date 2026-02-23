@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
-from typing import Any
 from uuid import UUID
 
 from sqlalchemy import select
@@ -14,9 +13,9 @@ from payroll_engine.calculators.types import (
     EmployeeCalculationContext,
     LineCandidate,
     LineType,
+    TaxableWages,
     TaxBracket,
     TaxRule,
-    TaxableWages,
 )
 from payroll_engine.models import (
     EmployeeTaxProfile,

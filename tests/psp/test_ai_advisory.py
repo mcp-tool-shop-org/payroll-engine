@@ -10,41 +10,34 @@ These tests verify that:
 """
 
 import json
-import pytest
 from datetime import datetime, timedelta
 from decimal import Decimal
-from uuid import uuid4, UUID
+from uuid import UUID, uuid4
+
+import pytest
 
 from payroll_engine.psp.ai.base import (
     AdvisoryConfig,
     AdvisoryMode,
-    ReturnAdvisory,
-    FundingRiskAdvisory,
     ContributingFactor,
+    FundingRiskAdvisory,
+    ReturnAdvisory,
 )
-from payroll_engine.psp.ai.features import (
-    ReturnFeatures,
-    FundingRiskFeatures,
-    RETURN_FEATURE_SCHEMA_VERSION,
-    FUNDING_RISK_FEATURE_SCHEMA_VERSION,
-)
-from payroll_engine.psp.ai.models.rules_baseline import (
-    RulesBaselineReturnModel,
-    RulesBaselineFundingRiskModel,
-)
-from payroll_engine.psp.ai.return_codes import (
-    get_return_code_info,
-    get_all_codes_by_fault_prior,
-)
-from payroll_engine.psp.ai.return_advisor import ReturnAdvisor
-from payroll_engine.psp.ai.funding_risk import FundingRiskAdvisor
+from payroll_engine.psp.ai.decision_record import compute_feature_hash
 from payroll_engine.psp.ai.explanations import (
-    format_advisory_explanation,
     explain_confidence,
     generate_audit_trail,
 )
-from payroll_engine.psp.ai.decision_record import compute_feature_hash
-
+from payroll_engine.psp.ai.features import (
+    FUNDING_RISK_FEATURE_SCHEMA_VERSION,
+    RETURN_FEATURE_SCHEMA_VERSION,
+    FundingRiskFeatures,
+    ReturnFeatures,
+)
+from payroll_engine.psp.ai.models.rules_baseline import (
+    RulesBaselineFundingRiskModel,
+    RulesBaselineReturnModel,
+)
 
 # =============================================================================
 # Configuration Tests
@@ -1073,7 +1066,7 @@ class TestInsightGenerator:
 
     def test_empty_decisions_returns_empty_report(self):
         """Empty input should return valid but empty report."""
-        from payroll_engine.psp.ai.insights import InsightGenerator, AdvisoryReport
+        from payroll_engine.psp.ai.insights import InsightGenerator
 
         generator = InsightGenerator()
         report = generator.generate_report(
@@ -1115,7 +1108,7 @@ class TestInsightGenerator:
 
     def test_high_override_rate_generates_insight(self):
         """High override rate for a return code should generate insight."""
-        from payroll_engine.psp.ai.insights import InsightGenerator, InsightCategory
+        from payroll_engine.psp.ai.insights import InsightCategory, InsightGenerator
 
         # Create decisions with high override rate
         decisions = []
@@ -1153,7 +1146,7 @@ class TestInsightGenerator:
 
     def test_confidence_drift_insight(self):
         """High-confidence overrides should generate confidence drift insight."""
-        from payroll_engine.psp.ai.insights import InsightGenerator, InsightCategory
+        from payroll_engine.psp.ai.insights import InsightCategory, InsightGenerator
 
         # Create high-confidence decisions that were overridden
         decisions = [
@@ -1226,9 +1219,7 @@ class TestInsightGenerator:
 
     def test_create_report_event(self):
         """Report event should be properly formed."""
-        from payroll_engine.psp.ai.insights import (
-            InsightGenerator, create_report_event
-        )
+        from payroll_engine.psp.ai.insights import InsightGenerator, create_report_event
 
         decisions = [
             {"outcome": "accepted", "confidence": 0.8, "advisory_type": "return",
@@ -1258,9 +1249,7 @@ class TestCounterfactualSimulator:
 
     def test_empty_batches_returns_empty_report(self):
         """Empty batch list should return valid but empty report."""
-        from payroll_engine.psp.ai.counterfactual import (
-            CounterfactualSimulator, STRICT_POLICY
-        )
+        from payroll_engine.psp.ai.counterfactual import STRICT_POLICY, CounterfactualSimulator
 
         simulator = CounterfactualSimulator()
         report = simulator.simulate(
@@ -1273,8 +1262,11 @@ class TestCounterfactualSimulator:
     def test_strict_policy_blocks_more_than_permissive(self):
         """Strict policy should block more batches than permissive."""
         from payroll_engine.psp.ai.counterfactual import (
-            CounterfactualSimulator, FundingPolicy, PayrollBatchSnapshot,
-            STRICT_POLICY, PERMISSIVE_POLICY
+            PERMISSIVE_POLICY,
+            STRICT_POLICY,
+            CounterfactualSimulator,
+            FundingPolicy,
+            PayrollBatchSnapshot,
         )
 
         # Create batches with moderate risk
@@ -1306,8 +1298,10 @@ class TestCounterfactualSimulator:
     def test_policy_application_correctness(self):
         """Policy rules should be correctly applied."""
         from payroll_engine.psp.ai.counterfactual import (
-            CounterfactualSimulator, FundingPolicy, PayrollBatchSnapshot,
-            STRICT_POLICY
+            STRICT_POLICY,
+            CounterfactualSimulator,
+            FundingPolicy,
+            PayrollBatchSnapshot,
         )
 
         # Create a batch that should be blocked under strict policy
@@ -1337,8 +1331,10 @@ class TestCounterfactualSimulator:
     def test_outcome_change_tracking(self):
         """Should correctly track when outcomes change."""
         from payroll_engine.psp.ai.counterfactual import (
-            CounterfactualSimulator, FundingPolicy, PayrollBatchSnapshot,
-            STRICT_POLICY
+            STRICT_POLICY,
+            CounterfactualSimulator,
+            FundingPolicy,
+            PayrollBatchSnapshot,
         )
 
         # Batch that was not blocked but would be under strict
@@ -1366,8 +1362,10 @@ class TestCounterfactualSimulator:
     def test_financial_impact_calculation(self):
         """Financial impact should be correctly calculated."""
         from payroll_engine.psp.ai.counterfactual import (
-            CounterfactualSimulator, FundingPolicy, PayrollBatchSnapshot,
-            STRICT_POLICY
+            STRICT_POLICY,
+            CounterfactualSimulator,
+            FundingPolicy,
+            PayrollBatchSnapshot,
         )
 
         batch = PayrollBatchSnapshot(
@@ -1394,8 +1392,10 @@ class TestCounterfactualSimulator:
     def test_report_to_markdown(self):
         """Report should serialize to markdown."""
         from payroll_engine.psp.ai.counterfactual import (
-            CounterfactualSimulator, FundingPolicy, PayrollBatchSnapshot,
-            STRICT_POLICY
+            STRICT_POLICY,
+            CounterfactualSimulator,
+            FundingPolicy,
+            PayrollBatchSnapshot,
         )
 
         batch = PayrollBatchSnapshot(
@@ -1423,8 +1423,12 @@ class TestCounterfactualSimulator:
     def test_compare_policies(self):
         """Should compare multiple policies."""
         from payroll_engine.psp.ai.counterfactual import (
-            CounterfactualSimulator, FundingPolicy, PayrollBatchSnapshot,
-            STRICT_POLICY, HYBRID_POLICY, PERMISSIVE_POLICY
+            HYBRID_POLICY,
+            PERMISSIVE_POLICY,
+            STRICT_POLICY,
+            CounterfactualSimulator,
+            FundingPolicy,
+            PayrollBatchSnapshot,
         )
 
         batch = PayrollBatchSnapshot(
@@ -1462,9 +1466,7 @@ class TestTenantRiskProfiler:
 
     def test_low_risk_tenant(self):
         """Tenant with no issues should be low risk."""
-        from payroll_engine.psp.ai.tenant_risk import (
-            TenantRiskProfiler, TenantMetrics, RiskLevel
-        )
+        from payroll_engine.psp.ai.tenant_risk import RiskLevel, TenantMetrics, TenantRiskProfiler
 
         metrics = TenantMetrics(
             tenant_id=uuid4(),
@@ -1486,9 +1488,7 @@ class TestTenantRiskProfiler:
 
     def test_high_return_rate_increases_risk(self):
         """High return rate should increase risk score."""
-        from payroll_engine.psp.ai.tenant_risk import (
-            TenantRiskProfiler, TenantMetrics, RiskLevel
-        )
+        from payroll_engine.psp.ai.tenant_risk import TenantMetrics, TenantRiskProfiler
 
         metrics = TenantMetrics(
             tenant_id=uuid4(),
@@ -1507,9 +1507,7 @@ class TestTenantRiskProfiler:
 
     def test_funding_blocks_increase_risk(self):
         """Multiple funding blocks should increase risk."""
-        from payroll_engine.psp.ai.tenant_risk import (
-            TenantRiskProfiler, TenantMetrics
-        )
+        from payroll_engine.psp.ai.tenant_risk import TenantMetrics, TenantRiskProfiler
 
         metrics = TenantMetrics(
             tenant_id=uuid4(),
@@ -1529,9 +1527,7 @@ class TestTenantRiskProfiler:
 
     def test_suspicious_patterns_flag_immediate_action(self):
         """Critical suspicious patterns should require immediate action."""
-        from payroll_engine.psp.ai.tenant_risk import (
-            TenantRiskProfiler, TenantMetrics
-        )
+        from payroll_engine.psp.ai.tenant_risk import TenantMetrics, TenantRiskProfiler
 
         metrics = TenantMetrics(
             tenant_id=uuid4(),
@@ -1551,9 +1547,7 @@ class TestTenantRiskProfiler:
 
     def test_new_tenant_flagged(self):
         """New tenants should be flagged with limited history."""
-        from payroll_engine.psp.ai.tenant_risk import (
-            TenantRiskProfiler, TenantMetrics
-        )
+        from payroll_engine.psp.ai.tenant_risk import TenantMetrics, TenantRiskProfiler
 
         metrics = TenantMetrics(
             tenant_id=uuid4(),
@@ -1576,9 +1570,7 @@ class TestTenantRiskProfiler:
 
     def test_profile_to_markdown(self):
         """Profile should serialize to markdown."""
-        from payroll_engine.psp.ai.tenant_risk import (
-            TenantRiskProfiler, TenantMetrics
-        )
+        from payroll_engine.psp.ai.tenant_risk import TenantMetrics, TenantRiskProfiler
 
         metrics = TenantMetrics(
             tenant_id=uuid4(),
@@ -1597,9 +1589,7 @@ class TestTenantRiskProfiler:
 
     def test_profile_to_dict(self):
         """Profile should serialize to dictionary."""
-        from payroll_engine.psp.ai.tenant_risk import (
-            TenantRiskProfiler, TenantMetrics
-        )
+        from payroll_engine.psp.ai.tenant_risk import TenantMetrics, TenantRiskProfiler
 
         metrics = TenantMetrics(
             tenant_id=uuid4(),
@@ -1619,7 +1609,9 @@ class TestTenantRiskProfiler:
     def test_create_risk_profile_event(self):
         """Risk profile event should be properly formed."""
         from payroll_engine.psp.ai.tenant_risk import (
-            TenantRiskProfiler, TenantMetrics, create_risk_profile_event
+            TenantMetrics,
+            TenantRiskProfiler,
+            create_risk_profile_event,
         )
 
         metrics = TenantMetrics(
@@ -1639,9 +1631,7 @@ class TestTenantRiskProfiler:
 
     def test_risk_level_thresholds(self):
         """Risk levels should follow defined thresholds."""
-        from payroll_engine.psp.ai.tenant_risk import (
-            TenantRiskProfiler, TenantMetrics, RiskLevel
-        )
+        from payroll_engine.psp.ai.tenant_risk import RiskLevel, TenantMetrics, TenantRiskProfiler
 
         profiler = TenantRiskProfiler()
 
@@ -1682,7 +1672,9 @@ class TestRunbookAssistant:
     def test_settlement_mismatch_assistance(self):
         """Settlement mismatch should get specific guidance."""
         from payroll_engine.psp.ai.runbook_assistant import (
-            RunbookAssistant, IncidentContext, IncidentType
+            IncidentContext,
+            IncidentType,
+            RunbookAssistant,
         )
 
         context = IncidentContext(
@@ -1707,7 +1699,9 @@ class TestRunbookAssistant:
     def test_funding_block_assistance(self):
         """Funding block should get specific guidance."""
         from payroll_engine.psp.ai.runbook_assistant import (
-            RunbookAssistant, IncidentContext, IncidentType
+            IncidentContext,
+            IncidentType,
+            RunbookAssistant,
         )
 
         context = IncidentContext(
@@ -1729,7 +1723,9 @@ class TestRunbookAssistant:
     def test_payment_return_assistance(self):
         """Payment return should get code-specific guidance."""
         from payroll_engine.psp.ai.runbook_assistant import (
-            RunbookAssistant, IncidentContext, IncidentType
+            IncidentContext,
+            IncidentType,
+            RunbookAssistant,
         )
 
         context = IncidentContext(
@@ -1753,7 +1749,9 @@ class TestRunbookAssistant:
     def test_high_risk_return_code_severity(self):
         """High-risk return codes should have higher severity."""
         from payroll_engine.psp.ai.runbook_assistant import (
-            RunbookAssistant, IncidentContext, IncidentType
+            IncidentContext,
+            IncidentType,
+            RunbookAssistant,
         )
 
         # R10 is a fraud indicator
@@ -1775,7 +1773,9 @@ class TestRunbookAssistant:
     def test_ledger_imbalance_assistance(self):
         """Ledger imbalance should get critical guidance."""
         from payroll_engine.psp.ai.runbook_assistant import (
-            RunbookAssistant, IncidentContext, IncidentType
+            IncidentContext,
+            IncidentType,
+            RunbookAssistant,
         )
 
         context = IncidentContext(
@@ -1796,7 +1796,9 @@ class TestRunbookAssistant:
     def test_unknown_incident_type_handled(self):
         """Unknown incident types should get generic guidance."""
         from payroll_engine.psp.ai.runbook_assistant import (
-            RunbookAssistant, IncidentContext, IncidentType
+            IncidentContext,
+            IncidentType,
+            RunbookAssistant,
         )
 
         context = IncidentContext(
@@ -1816,7 +1818,9 @@ class TestRunbookAssistant:
     def test_assistance_to_markdown(self):
         """Assistance should serialize to markdown."""
         from payroll_engine.psp.ai.runbook_assistant import (
-            RunbookAssistant, IncidentContext, IncidentType
+            IncidentContext,
+            IncidentType,
+            RunbookAssistant,
         )
 
         context = IncidentContext(
@@ -1839,7 +1843,9 @@ class TestRunbookAssistant:
     def test_assistance_to_dict(self):
         """Assistance should serialize to dictionary."""
         from payroll_engine.psp.ai.runbook_assistant import (
-            RunbookAssistant, IncidentContext, IncidentType
+            IncidentContext,
+            IncidentType,
+            RunbookAssistant,
         )
 
         context = IncidentContext(
@@ -1862,8 +1868,10 @@ class TestRunbookAssistant:
     def test_create_assistance_event(self):
         """Assistance event should be properly formed."""
         from payroll_engine.psp.ai.runbook_assistant import (
-            RunbookAssistant, IncidentContext, IncidentType,
-            create_assistance_event
+            IncidentContext,
+            IncidentType,
+            RunbookAssistant,
+            create_assistance_event,
         )
 
         context = IncidentContext(
@@ -1886,7 +1894,9 @@ class TestRunbookAssistant:
     def test_diagnostic_queries_are_prefilled_not_executed(self):
         """Diagnostic queries should be generated but never executed."""
         from payroll_engine.psp.ai.runbook_assistant import (
-            RunbookAssistant, IncidentContext, IncidentType
+            IncidentContext,
+            IncidentType,
+            RunbookAssistant,
         )
 
         tenant_id = uuid4()

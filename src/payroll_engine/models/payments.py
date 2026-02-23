@@ -204,7 +204,7 @@ class PaymentInstruction(Base):
     )
 
     # Relationships
-    attempts: Mapped[list["PaymentAttempt"]] = relationship("PaymentAttempt", back_populates="instruction")
+    attempts: Mapped[list[PaymentAttempt]] = relationship("PaymentAttempt", back_populates="instruction")
 
 
 class PaymentAttempt(Base):
@@ -239,7 +239,7 @@ class PaymentAttempt(Base):
     )
 
     # Relationships
-    instruction: Mapped["PaymentInstruction"] = relationship("PaymentInstruction", back_populates="attempts")
+    instruction: Mapped[PaymentInstruction] = relationship("PaymentInstruction", back_populates="attempts")
 
 
 class FundingRequest(Base):
@@ -287,7 +287,7 @@ class FundingRequest(Base):
     )
 
     # Relationships
-    events: Mapped[list["FundingEvent"]] = relationship("FundingEvent", back_populates="funding_request")
+    events: Mapped[list[FundingEvent]] = relationship("FundingEvent", back_populates="funding_request")
 
 
 class FundingEvent(Base):
@@ -322,7 +322,7 @@ class FundingEvent(Base):
     )
 
     # Relationships
-    funding_request: Mapped["FundingRequest"] = relationship("FundingRequest", back_populates="events")
+    funding_request: Mapped[FundingRequest] = relationship("FundingRequest", back_populates="events")
 
 
 class FundingGateEvaluation(Base):

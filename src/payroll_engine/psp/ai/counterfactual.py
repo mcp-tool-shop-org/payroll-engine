@@ -14,10 +14,9 @@ CRITICAL: This is read-only analysis. It NEVER modifies state.
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Optional, Protocol
 from uuid import UUID, uuid4
 
 
@@ -116,7 +115,7 @@ class PayrollBatchSnapshot:
     # Actual outcome
     was_blocked: bool
     actual_policy: FundingPolicy
-    block_reason: Optional[str] = None
+    block_reason: str | None = None
 
     # Additional context
     available_balance: Decimal = Decimal("0")
@@ -216,23 +215,23 @@ class CounterfactualReport:
                        Use 0 for unlimited.
         """
         lines = [
-            f"# Counterfactual Policy Analysis",
-            f"",
+            "# Counterfactual Policy Analysis",
+            "",
             f"**Period:** {self.period_start.date()} to {self.period_end.date()}",
             f"**Generated:** {self.generated_at.isoformat()}",
-            f"",
-            f"## Policy Comparison",
-            f"",
-            f"| | Actual | Counterfactual |",
-            f"|---|--------|----------------|",
+            "",
+            "## Policy Comparison",
+            "",
+            "| | Actual | Counterfactual |",
+            "|---|--------|----------------|",
             f"| Policy | {self.actual_policy.value.upper()} | {self.counterfactual_policy.value.upper()} |",
             f"| Blocks | {self.actual_blocks} | {self.counterfactual_blocks} |",
             f"| Block Rate | {self._pct(self.actual_blocks, self.total_batches)} | {self._pct(self.counterfactual_blocks, self.total_batches)} |",
-            f"",
-            f"## Impact Summary",
-            f"",
-            f"| Metric | Value |",
-            f"|--------|-------|",
+            "",
+            "## Impact Summary",
+            "",
+            "| Metric | Value |",
+            "|--------|-------|",
             f"| Total Batches Analyzed | {self.total_batches} |",
             f"| Additional Blocks | {self.additional_blocks} |",
             f"| Avoided Blocks | {self.avoided_blocks} |",
@@ -240,15 +239,15 @@ class CounterfactualReport:
             f"| Payroll Volume at Risk | ${self.payroll_that_would_block:,.2f} |",
             f"| Additional Buffer Needed | ${self.additional_buffer_required:,.2f} |",
             f"| Est. Delay Impact | {self.estimated_delay_days} days |",
-            f"",
+            "",
         ]
 
         if self.additional_blocks > 0:
             lines.extend([
                 f"## Additional Blocks Under {self.counterfactual_policy.value.upper()}",
-                f"",
+                "",
                 f"The following {self.additional_blocks} batches would have been blocked:",
-                f"",
+                "",
             ])
             shown = 0
             for outcome in self.outcomes:
@@ -264,9 +263,9 @@ class CounterfactualReport:
         if self.avoided_blocks > 0:
             lines.extend([
                 f"## Avoided Blocks Under {self.counterfactual_policy.value.upper()}",
-                f"",
+                "",
                 f"The following {self.avoided_blocks} batches would NOT have been blocked:",
-                f"",
+                "",
             ])
             shown = 0
             for outcome in self.outcomes:
@@ -309,8 +308,8 @@ class CounterfactualSimulator:
         self,
         batches: list[PayrollBatchSnapshot],
         counterfactual_policy: PolicyConfig,
-        period_start: Optional[datetime] = None,
-        period_end: Optional[datetime] = None,
+        period_start: datetime | None = None,
+        period_end: datetime | None = None,
     ) -> CounterfactualReport:
         """
         Run counterfactual simulation.

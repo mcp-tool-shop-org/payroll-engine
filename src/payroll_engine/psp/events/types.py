@@ -17,8 +17,8 @@ Events are the source of truth for what happened. They enable:
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field, asdict
-from datetime import datetime, date
+from dataclasses import asdict, dataclass
+from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
 from typing import Any
@@ -118,9 +118,7 @@ def _serialize_dict(obj: Any) -> Any:
         return [_serialize_dict(v) for v in obj]
     elif isinstance(obj, UUID):
         return str(obj)
-    elif isinstance(obj, datetime):
-        return obj.isoformat()
-    elif isinstance(obj, date):
+    elif isinstance(obj, datetime) or isinstance(obj, date):
         return obj.isoformat()
     elif isinstance(obj, Decimal):
         return str(obj)

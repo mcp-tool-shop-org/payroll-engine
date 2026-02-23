@@ -18,19 +18,15 @@ The tests ensure invariants hold under adversarial conditions.
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 from uuid import uuid4
-import threading
-import time
-from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from payroll_engine.psp.services.ledger_service import LedgerService
-from payroll_engine.psp.services.funding_gate import FundingGateService
-from payroll_engine.psp.services.payment_orchestrator import PaymentOrchestrator
-from payroll_engine.psp.services.reconciliation import ReconciliationService
 from payroll_engine.psp.providers.ach_stub import AchStubProvider
+from payroll_engine.psp.services.funding_gate import FundingGateService
+from payroll_engine.psp.services.ledger_service import LedgerService
+from payroll_engine.psp.services.payment_orchestrator import PaymentOrchestrator
 from tests.psp.conftest import PSPTestData
 
 

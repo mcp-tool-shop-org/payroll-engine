@@ -12,7 +12,6 @@ from typing import Any
 
 from payroll_engine.psp.providers.base import (
     CancelResult,
-    PaymentRailProvider,
     RailCapabilities,
     SettlementRecord,
     StatusResult,
@@ -92,7 +91,7 @@ class AchStubProvider:
         self._submitted[provider_request_id] = {
             "instruction": instruction,
             "trace_id": trace_id,
-            "submitted_at": datetime.datetime.now(datetime.timezone.utc),
+            "submitted_at": datetime.datetime.now(datetime.UTC),
             "estimated_settlement": est_settlement,
             "status": "settled" if self.auto_settle else "accepted",
         }

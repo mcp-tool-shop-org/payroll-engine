@@ -1,6 +1,6 @@
 """Pay run API endpoints."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Annotated
 from uuid import UUID
 
@@ -27,7 +27,7 @@ from payroll_engine.api.schemas import (
     ReopenResponse,
 )
 from payroll_engine.models.employee import Employee, Employment
-from payroll_engine.models.payroll import PayLineItem, PayRun, PayRunEmployee, PayStatement
+from payroll_engine.models.payroll import PayRun, PayRunEmployee, PayStatement
 from payroll_engine.services.commit_service import CommitService
 from payroll_engine.services.locking_service import LockingService
 from payroll_engine.services.pay_run_service import PayRunService
@@ -279,7 +279,7 @@ async def preview_pay_run(
         total_gross=preview_result.total_gross,
         total_net=preview_result.total_net,
         total_employer_taxes=preview_result.total_employer_taxes,
-        computed_at=datetime.now(timezone.utc),
+        computed_at=datetime.now(UTC),
     )
 
 
@@ -317,7 +317,7 @@ async def approve_pay_run(
     locked_count = await locking_service.lock_inputs(pay_run_id)
 
     # Set approval metadata
-    pay_run.approved_at = datetime.now(timezone.utc)
+    pay_run.approved_at = datetime.now(UTC)
     pay_run.approved_by = payload.approver_id
 
     await db.commit()
@@ -422,7 +422,7 @@ async def reopen_pay_run(
         pay_run_id=pay_run_id,
         status="preview",
         inputs_unlocked=unlocked_count,
-        reopened_at=datetime.now(timezone.utc),
+        reopened_at=datetime.now(UTC),
     )
 
 

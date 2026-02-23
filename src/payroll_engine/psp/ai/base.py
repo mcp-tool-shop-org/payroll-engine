@@ -4,11 +4,11 @@ Base interfaces for PSP AI Advisory Engine.
 All advisors share these foundational types and constraints.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Optional, Protocol
+from typing import Any, Protocol
 from uuid import UUID
 
 
@@ -128,7 +128,7 @@ class ReturnAdvisory(Advisory):
 @dataclass(frozen=True)
 class FundingRiskAdvisory(Advisory):
     """Advisory for payroll funding risk prediction."""
-    payroll_batch_id: Optional[UUID]  # None for general tenant risk
+    payroll_batch_id: UUID | None  # None for general tenant risk
     predicted_amount: Decimal
     risk_score: float  # 0.0 (no risk) to 1.0 (certain failure)
     risk_band: str  # "low", "medium", "high", "critical"

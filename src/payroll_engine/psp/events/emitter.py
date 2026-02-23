@@ -12,9 +12,8 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from collections import defaultdict
-from dataclasses import dataclass, field
-from typing import Any, Callable, Protocol, TypeVar, runtime_checkable
+from dataclasses import dataclass
+from typing import Any, Protocol, TypeVar, runtime_checkable
 
 from payroll_engine.psp.events.types import DomainEvent, EventCategory
 

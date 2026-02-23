@@ -38,77 +38,77 @@ without any AI dependencies or runtime cost.
 # Optionality support - always importable
 # ===========================================================================
 from payroll_engine.psp.ai._optional import (
+    STDLIB_MODELS,
+    AINotInstalledError,
     is_ai_available,
     is_ml_available,
     require_ai_deps,
-    AINotInstalledError,
-    STDLIB_MODELS,
 )
 
 # ===========================================================================
 # Core types - always importable (no external deps)
 # ===========================================================================
 from payroll_engine.psp.ai.base import (
+    Advisory,
     AdvisoryConfig,
     AdvisoryMode,
-    Advisory,
-)
-from payroll_engine.psp.ai.features import (
-    ReturnFeatures,
-    FundingRiskFeatures,
-    FeatureExtractor,
-)
-from payroll_engine.psp.ai.return_advisor import ReturnAdvisor
-from payroll_engine.psp.ai.funding_risk import FundingRiskAdvisor
-
-# ===========================================================================
-# Learning loop and insights
-# ===========================================================================
-from payroll_engine.psp.ai.insights import (
-    InsightGenerator,
-    AdvisoryReport,
-    Insight,
-    InsightSeverity,
-    InsightCategory,
-    create_report_event,
 )
 
 # ===========================================================================
 # Counterfactual simulation
 # ===========================================================================
 from payroll_engine.psp.ai.counterfactual import (
-    CounterfactualSimulator,
-    CounterfactualReport,
-    PayrollBatchSnapshot,
-    FundingPolicy,
-    PolicyConfig,
-    get_policy_config,
-    STRICT_POLICY,
     HYBRID_POLICY,
     PERMISSIVE_POLICY,
+    STRICT_POLICY,
+    CounterfactualReport,
+    CounterfactualSimulator,
+    FundingPolicy,
+    PayrollBatchSnapshot,
+    PolicyConfig,
+    get_policy_config,
+)
+from payroll_engine.psp.ai.features import (
+    FeatureExtractor,
+    FundingRiskFeatures,
+    ReturnFeatures,
+)
+from payroll_engine.psp.ai.funding_risk import FundingRiskAdvisor
+
+# ===========================================================================
+# Learning loop and insights
+# ===========================================================================
+from payroll_engine.psp.ai.insights import (
+    AdvisoryReport,
+    Insight,
+    InsightCategory,
+    InsightGenerator,
+    InsightSeverity,
+    create_report_event,
+)
+from payroll_engine.psp.ai.return_advisor import ReturnAdvisor
+
+# ===========================================================================
+# Runbook assistance
+# ===========================================================================
+from payroll_engine.psp.ai.runbook_assistant import (
+    IncidentContext,
+    IncidentType,
+    RunbookAssistance,
+    RunbookAssistant,
+    create_assistance_event,
 )
 
 # ===========================================================================
 # Tenant risk scoring
 # ===========================================================================
 from payroll_engine.psp.ai.tenant_risk import (
-    TenantRiskProfiler,
-    TenantRiskProfile,
-    TenantMetrics,
     RiskLevel,
     RiskSignal,
+    TenantMetrics,
+    TenantRiskProfile,
+    TenantRiskProfiler,
     create_risk_profile_event,
-)
-
-# ===========================================================================
-# Runbook assistance
-# ===========================================================================
-from payroll_engine.psp.ai.runbook_assistant import (
-    RunbookAssistant,
-    RunbookAssistance,
-    IncidentContext,
-    IncidentType,
-    create_assistance_event,
 )
 
 __all__ = [

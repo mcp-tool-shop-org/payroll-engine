@@ -3,26 +3,21 @@
 Goal: Commit is safe under retries.
 """
 
-import pytest
 from decimal import Decimal
-from uuid import UUID, uuid4
 
-from sqlalchemy import select, text, func
+import pytest
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from payroll_engine.models.payroll import (
     PayRun,
     PayRunEmployee,
-    PayStatement,
-    PayLineItem,
 )
 from payroll_engine.services.commit_service import CommitService
-from payroll_engine.services.pay_run_service import PayRunService
-from payroll_engine.services.state_machine import PayRunStateMachine
 from payroll_engine.services.locking_service import LockingService
+from payroll_engine.services.state_machine import PayRunStateMachine
 
 from .conftest import DRAFT_PAY_RUN_ID
-
 
 pytestmark = pytest.mark.asyncio
 

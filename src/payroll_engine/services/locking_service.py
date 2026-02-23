@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import datetime
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import select, update
@@ -14,13 +14,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from payroll_engine.models import (
     PayInputAdjustment,
     PayRun,
-    PayRunEmployee,
     PayRunLock,
     TimeEntry,
 )
-
-if TYPE_CHECKING:
-    pass
 
 
 class LockingService:

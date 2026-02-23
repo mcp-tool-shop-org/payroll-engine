@@ -15,35 +15,34 @@ from uuid import uuid4
 
 import pytest
 
+from payroll_engine.psp.events.emitter import (
+    AsyncEventEmitter,
+    EventEmitter,
+)
 from payroll_engine.psp.events.types import (
-    EventMetadata,
     EventCategory,
-    # Funding events
-    FundingRequested,
+    EventMetadata,
     FundingApproved,
     FundingBlocked,
     FundingInsufficientFunds,
-    # Payment events
-    PaymentInstructionCreated,
-    PaymentSubmitted,
-    PaymentSettled,
-    PaymentFailed,
-    PaymentReturned,
+    # Funding events
+    FundingRequested,
     # Ledger events
     LedgerEntryPosted,
     LedgerEntryReversed,
+    # Liability events
+    LiabilityClassified,
+    PaymentFailed,
+    # Payment events
+    PaymentInstructionCreated,
+    PaymentReturned,
+    PaymentSettled,
+    ReconciliationCompleted,
+    # Reconciliation events
+    ReconciliationStarted,
     # Settlement events
     SettlementReceived,
     SettlementStatusChanged,
-    # Liability events
-    LiabilityClassified,
-    # Reconciliation events
-    ReconciliationStarted,
-    ReconciliationCompleted,
-)
-from payroll_engine.psp.events.emitter import (
-    EventEmitter,
-    AsyncEventEmitter,
 )
 
 

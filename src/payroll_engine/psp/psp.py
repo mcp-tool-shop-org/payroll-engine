@@ -29,45 +29,42 @@ The facade:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, date, timedelta
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 from enum import Enum
-from typing import Protocol, Any
+from typing import Any
 from uuid import UUID, uuid4
 
-from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
-from payroll_engine.psp.services.ledger_service import LedgerService, AsyncLedgerService
-from payroll_engine.psp.services.funding_gate import FundingGateService, AsyncFundingGateService
-from payroll_engine.psp.services.payment_orchestrator import (
-    PaymentOrchestrator,
-    AsyncPaymentOrchestrator,
-)
-from payroll_engine.psp.services.reconciliation import (
-    ReconciliationService,
-    AsyncReconciliationService,
-)
-from payroll_engine.psp.services.liability import LiabilityService, AsyncLiabilityService
-from payroll_engine.psp.providers.base import PaymentRailProvider, SettlementRecord
+from payroll_engine.psp.events.emitter import AsyncEventEmitter, EventEmitter
 from payroll_engine.psp.events.types import (
     EventMetadata,
-    FundingRequested,
     FundingApproved,
     FundingBlocked,
     FundingInsufficientFunds,
-    PaymentInstructionCreated,
-    PaymentSubmitted,
-    PaymentSettled,
-    PaymentFailed,
-    PaymentReturned,
-    SettlementReceived,
-    SettlementMatched,
-    ReconciliationStarted,
-    ReconciliationCompleted,
+    FundingRequested,
     LiabilityClassified,
+    PaymentFailed,
+    PaymentInstructionCreated,
+    PaymentReturned,
+    PaymentSettled,
+    PaymentSubmitted,
+    ReconciliationCompleted,
+    ReconciliationStarted,
+    SettlementReceived,
 )
-from payroll_engine.psp.events.emitter import EventEmitter, AsyncEventEmitter
+from payroll_engine.psp.providers.base import PaymentRailProvider, SettlementRecord
+from payroll_engine.psp.services.funding_gate import AsyncFundingGateService, FundingGateService
+from payroll_engine.psp.services.ledger_service import AsyncLedgerService, LedgerService
+from payroll_engine.psp.services.liability import AsyncLiabilityService, LiabilityService
+from payroll_engine.psp.services.payment_orchestrator import (
+    PaymentOrchestrator,
+)
+from payroll_engine.psp.services.reconciliation import (
+    ReconciliationService,
+)
 
 
 class CommitStatus(str, Enum):

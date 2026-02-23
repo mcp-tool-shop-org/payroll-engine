@@ -3,11 +3,9 @@
 Goal: Reopening creates new preview identity; commit requires reapproval.
 """
 
-import pytest
 from decimal import Decimal
-from uuid import UUID
 
-from sqlalchemy import select, text
+import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from payroll_engine.models.payroll import PayRun, TimeEntry
@@ -15,8 +13,7 @@ from payroll_engine.services.locking_service import LockingService
 from payroll_engine.services.pay_run_service import PayRunService
 from payroll_engine.services.state_machine import PayRunStateMachine, StateTransitionError
 
-from .conftest import DRAFT_PAY_RUN_ID, ALICE_TIME_ENTRY_ID
-
+from .conftest import ALICE_TIME_ENTRY_ID, DRAFT_PAY_RUN_ID
 
 pytestmark = pytest.mark.asyncio
 
@@ -203,7 +200,7 @@ class TestReapprovalRequired:
             await seeded_db.refresh(pay_run)
             if pay_run.status == "committed":
                 pytest.fail("Should require reapproval before commit")
-        except (StateTransitionError, Exception) as e:
+        except (StateTransitionError, Exception):
             # Good - commit should fail without approval
             pass
 

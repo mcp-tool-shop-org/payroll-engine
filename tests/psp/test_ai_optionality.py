@@ -10,7 +10,6 @@ These tests verify the "enterprise adoptable" contract:
 This is what makes the repo trustworthy for production use.
 """
 
-import pytest
 
 
 class TestCoreImportsWithoutAI:
@@ -25,11 +24,11 @@ class TestCoreImportsWithoutAI:
         """
         # These should NEVER fail regardless of AI installation
         from payroll_engine.psp import (
-            LedgerService,
             FundingGateService,
+            LedgerService,
+            LiabilityService,
             PaymentOrchestrator,
             ReconciliationService,
-            LiabilityService,
         )
 
         # Verify they're real classes, not import stubs
@@ -45,9 +44,9 @@ class TestCoreImportsWithoutAI:
             DomainEvent,
             FundingApproved,
             FundingBlocked,
-            PaymentSettled,
-            PaymentReturned,
             LedgerEntryPosted,
+            PaymentReturned,
+            PaymentSettled,
         )
 
         # Verify they're real classes
@@ -61,9 +60,9 @@ class TestCoreImportsWithoutAI:
     def test_psp_providers_import_without_ai(self):
         """Rail providers work without AI."""
         from payroll_engine.psp import (
-            PaymentRailProvider,
             AchStubProvider,
             FedNowStubProvider,
+            PaymentRailProvider,
         )
 
         assert PaymentRailProvider is not None
@@ -102,7 +101,7 @@ class TestAIDisabledByDefault:
 
     def test_cannot_enable_non_advisory_mode(self):
         """Attempting to set non-advisory mode raises error."""
-        from payroll_engine.psp.ai import AdvisoryConfig, AdvisoryMode
+        from payroll_engine.psp.ai import AdvisoryMode
 
         # AdvisoryMode only has ADVISORY_ONLY, so we can't even construct
         # a bad mode value through the enum. This test documents the intent.
@@ -115,7 +114,7 @@ class TestAIAvailabilityChecks:
 
     def test_rules_baseline_always_available(self):
         """Rules-baseline model works without any extras."""
-        from payroll_engine.psp.ai import is_ai_available, STDLIB_MODELS
+        from payroll_engine.psp.ai import STDLIB_MODELS, is_ai_available
 
         # rules_baseline is always available
         assert is_ai_available("rules_baseline") is True
@@ -189,8 +188,8 @@ class TestAIExplicitEnablement:
         """Advisors check their enabled state."""
         from payroll_engine.psp.ai import (
             AdvisoryConfig,
-            ReturnAdvisor,
             FundingRiskAdvisor,
+            ReturnAdvisor,
         )
 
         # Create a mock event store (advisors require this)
@@ -244,12 +243,12 @@ class TestPublicAPISurface:
     def test_core_advisors_importable(self):
         """Core advisor classes are importable."""
         from payroll_engine.psp.ai import (
-            ReturnAdvisor,
+            CounterfactualSimulator,
             FundingRiskAdvisor,
             InsightGenerator,
-            CounterfactualSimulator,
-            TenantRiskProfiler,
+            ReturnAdvisor,
             RunbookAssistant,
+            TenantRiskProfiler,
         )
 
         # All should be real classes
@@ -263,9 +262,9 @@ class TestPublicAPISurface:
     def test_config_classes_importable(self):
         """Config and type classes are importable."""
         from payroll_engine.psp.ai import (
+            Advisory,
             AdvisoryConfig,
             AdvisoryMode,
-            Advisory,
             FundingPolicy,
             PolicyConfig,
             RiskLevel,
@@ -310,7 +309,7 @@ class TestModuleStructure:
 
         Users can import payroll_engine.psp without ever touching AI.
         """
-        import payroll_engine.psp as psp
+        from payroll_engine import psp
 
         # AI should NOT be in the main __all__
         assert "ReturnAdvisor" not in dir(psp)

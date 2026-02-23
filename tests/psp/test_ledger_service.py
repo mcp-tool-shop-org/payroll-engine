@@ -14,7 +14,7 @@ import pytest
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from payroll_engine.psp.services.ledger_service import LedgerService, Balance, PostResult
+from payroll_engine.psp.services.ledger_service import LedgerService
 from tests.psp.conftest import PSPTestData
 
 

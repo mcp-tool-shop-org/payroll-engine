@@ -9,14 +9,12 @@ CRITICAL: All features must be:
 If a feature can't be recomputed from history, it doesn't belong here.
 """
 
+import hashlib
+import json
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import Optional, Sequence
 from uuid import UUID
-import hashlib
-import json
-
 
 # Feature schema version - bump when adding/changing features
 RETURN_FEATURE_SCHEMA_VERSION = "1.0.0"
@@ -64,7 +62,7 @@ class ReturnFeatures:
     provider_avg_settlement_days: float
 
     # Payment context
-    payment_purpose: Optional[str]  # "payroll", "bonus", "expense", etc.
+    payment_purpose: str | None  # "payroll", "bonus", "expense", etc.
     batch_size: int  # Number of payments in the same batch
 
     @property
@@ -117,7 +115,7 @@ class FundingRiskFeatures:
     """
     # Core payroll info
     tenant_id: UUID
-    payroll_batch_id: Optional[UUID]
+    payroll_batch_id: UUID | None
     payroll_amount: Decimal
     payment_count: int
     scheduled_date: datetime
@@ -129,7 +127,7 @@ class FundingRiskFeatures:
     max_payroll_amount_90d: Decimal
 
     # Funding history
-    days_since_last_funding_block: Optional[int]  # None if never blocked
+    days_since_last_funding_block: int | None  # None if never blocked
     funding_blocks_30d: int
     funding_blocks_90d: int
     historical_block_rate: float  # Blocks / total payroll runs
@@ -306,7 +304,7 @@ class FeatureExtractor:
         payroll_amount: Decimal,
         payment_count: int,
         scheduled_date: datetime,
-        payroll_batch_id: Optional[UUID] = None,
+        payroll_batch_id: UUID | None = None,
     ) -> FundingRiskFeatures:
         """
         Extract features for funding risk prediction.
@@ -408,7 +406,7 @@ class FeatureExtractor:
     # Event store query methods (to be implemented with real event store)
     # =========================================================================
 
-    def _get_payment_event(self, payment_id: UUID) -> Optional[dict]:
+    def _get_payment_event(self, payment_id: UUID) -> dict | None:
         """Get the original payment creation event."""
         events = self._event_store.get_events(
             event_type="PaymentInstructionCreated",
@@ -418,8 +416,8 @@ class FeatureExtractor:
         return events[0] if events else None
 
     def _get_payee_account_created(
-        self, tenant_id: UUID, payee_id: Optional[str]
-    ) -> Optional[datetime]:
+        self, tenant_id: UUID, payee_id: str | None
+    ) -> datetime | None:
         """Get when payee account was first used."""
         if not payee_id:
             return None
@@ -435,7 +433,7 @@ class FeatureExtractor:
         return None
 
     def _count_payee_returns(
-        self, tenant_id: UUID, payee_id: Optional[str], start: datetime, end: datetime
+        self, tenant_id: UUID, payee_id: str | None, start: datetime, end: datetime
     ) -> int:
         """Count returns for a specific payee."""
         if not payee_id:
@@ -549,7 +547,7 @@ class FeatureExtractor:
 
     def _get_last_funding_block(
         self, tenant_id: UUID, before: datetime
-    ) -> Optional[datetime]:
+    ) -> datetime | None:
         """Get the most recent funding block."""
         events = self._event_store.get_events(
             tenant_id=tenant_id,

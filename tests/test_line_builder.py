@@ -3,8 +3,6 @@
 from decimal import Decimal
 from uuid import uuid4
 
-import pytest
-
 from payroll_engine.calculators.line_builder import LineItemBuilder
 from payroll_engine.calculators.types import LineCandidate, LineType
 

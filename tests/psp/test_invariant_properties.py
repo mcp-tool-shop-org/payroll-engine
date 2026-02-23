@@ -9,16 +9,17 @@ This is where libraries become "unbreakable."
 
 from __future__ import annotations
 
-import pytest
 from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Callable
 from uuid import UUID, uuid4
+
+import pytest
 
 # Try to import hypothesis, skip tests if not available
 try:
-    from hypothesis import given, settings, assume, strategies as st
-    from hypothesis.stateful import RuleBasedStateMachine, rule, invariant, initialize
+    from hypothesis import given, settings
+    from hypothesis import strategies as st
+    from hypothesis.stateful import RuleBasedStateMachine, initialize, invariant, rule
 
     HYPOTHESIS_AVAILABLE = True
 except ImportError:

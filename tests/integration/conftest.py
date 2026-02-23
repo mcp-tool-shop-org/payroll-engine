@@ -2,8 +2,6 @@
 
 import asyncio
 from collections.abc import AsyncGenerator
-from decimal import Decimal
-from typing import Any
 from uuid import UUID
 
 import pytest
@@ -14,8 +12,6 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 from payroll_engine.api.app import create_app
 from payroll_engine.config import settings
-from payroll_engine.database import Base, async_session_factory
-
 
 # Test database URL - use test database
 TEST_DATABASE_URL = settings.database_url.replace("payroll_dev", "payroll_test")
@@ -111,7 +107,7 @@ async def seeded_db(db_session: AsyncSession) -> AsyncGenerator[AsyncSession, No
     """Load seed_minimal.sql fixture data."""
     # Read and execute seed file
     seed_path = "F:/payroll-engine/phase1_pack_additions/fixtures/seed_minimal.sql"
-    with open(seed_path, "r") as f:
+    with open(seed_path) as f:
         seed_sql = f.read()
 
     # Execute seed SQL - split by statements

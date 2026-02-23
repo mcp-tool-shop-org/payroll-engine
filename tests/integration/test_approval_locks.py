@@ -3,24 +3,21 @@
 Goal: Once approved, inputs cannot change.
 """
 
-import pytest
 from decimal import Decimal
-from uuid import UUID
 
-from sqlalchemy import select, text, update
-from sqlalchemy.exc import IntegrityError
+import pytest
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from payroll_engine.models.payroll import PayRun, TimeEntry, PayInputAdjustment
+from payroll_engine.models.payroll import PayInputAdjustment, PayRun, TimeEntry
 from payroll_engine.services.locking_service import LockingService
 from payroll_engine.services.state_machine import PayRunStateMachine
 
 from .conftest import (
-    DRAFT_PAY_RUN_ID,
-    ALICE_TIME_ENTRY_ID,
     ALICE_BONUS_ADJ_ID,
+    ALICE_TIME_ENTRY_ID,
+    DRAFT_PAY_RUN_ID,
 )
-
 
 pytestmark = pytest.mark.asyncio
 
@@ -172,7 +169,7 @@ class TestLockedInputProtection:
             if time_entry is None:
                 pytest.fail("Locked time entry should not be deletable")
 
-        except Exception as e:
+        except Exception:
             # Expected: trigger should block delete
             pass  # Good, delete was blocked
 

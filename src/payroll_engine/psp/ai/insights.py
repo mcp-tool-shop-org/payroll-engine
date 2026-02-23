@@ -14,12 +14,10 @@ CRITICAL: This is read-only analysis. It NEVER modifies state.
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-from decimal import Decimal
+from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 from uuid import UUID, uuid4
-import json
 
 
 class InsightSeverity(Enum):
@@ -126,15 +124,15 @@ class AdvisoryReport:
     def to_markdown(self) -> str:
         """Generate markdown report."""
         lines = [
-            f"# AI Advisory Report",
-            f"",
+            "# AI Advisory Report",
+            "",
             f"**Period:** {self.period_start.date()} to {self.period_end.date()}",
             f"**Generated:** {self.generated_at.isoformat()}",
-            f"",
-            f"## Summary",
-            f"",
-            f"| Metric | Value |",
-            f"|--------|-------|",
+            "",
+            "## Summary",
+            "",
+            "| Metric | Value |",
+            "|--------|-------|",
             f"| Total Advisories | {self.total_advisories} |",
             f"| Decisions Made | {self.total_decisions} |",
             f"| Accepted | {self.accepted_count} ({self._pct(self.accepted_count, self.total_decisions)}) |",
@@ -143,13 +141,13 @@ class AdvisoryReport:
             f"| Pending | {self.pending_count} |",
             f"| **Overall Accuracy** | **{self.overall_accuracy:.1%}** |",
             f"| High-Confidence Accuracy | {self.high_confidence_accuracy:.1%} |",
-            f"",
+            "",
         ]
 
         if self.insights:
             lines.extend([
                 f"## Insights ({len(self.insights)})",
-                f"",
+                "",
             ])
 
             # Group by severity
@@ -168,19 +166,19 @@ class AdvisoryReport:
                     for insight in insight_list:
                         lines.extend([
                             f"#### {insight.title}",
-                            f"",
+                            "",
                             f"{insight.summary}",
-                            f"",
+                            "",
                             f"**Recommendation:** {insight.recommendation}",
-                            f"",
+                            "",
                         ])
 
         if self.by_return_code:
             lines.extend([
-                f"## Override Rates by Return Code",
-                f"",
-                f"| Code | Total | Overridden | Override Rate |",
-                f"|------|-------|------------|---------------|",
+                "## Override Rates by Return Code",
+                "",
+                "| Code | Total | Overridden | Override Rate |",
+                "|------|-------|------------|---------------|",
             ])
             sorted_codes = sorted(
                 self.by_return_code.items(),

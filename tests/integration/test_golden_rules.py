@@ -7,10 +7,9 @@ Validates fundamental payroll engine constraints:
 - Tax jurisdiction references
 """
 
-import pytest
 from decimal import Decimal
-from uuid import UUID
 
+import pytest
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,8 +19,7 @@ from payroll_engine.services.locking_service import LockingService
 from payroll_engine.services.pay_run_service import PayRunService
 from payroll_engine.services.state_machine import PayRunStateMachine
 
-from .conftest import DRAFT_PAY_RUN_ID, ALICE_EMPLOYEE_ID, BOB_EMPLOYEE_ID
-
+from .conftest import DRAFT_PAY_RUN_ID
 
 pytestmark = pytest.mark.asyncio
 
@@ -80,13 +78,13 @@ class TestNoFloatingPoint:
 
         for emp in result.employee_results:
             assert isinstance(emp.gross, Decimal), \
-                f"employee gross should be Decimal"
+                "employee gross should be Decimal"
             assert isinstance(emp.net, Decimal), \
-                f"employee net should be Decimal"
+                "employee net should be Decimal"
 
             for line in emp.lines:
                 assert isinstance(line.amount, Decimal), \
-                    f"line amount should be Decimal"
+                    "line amount should be Decimal"
 
 
 class TestSignConventions:

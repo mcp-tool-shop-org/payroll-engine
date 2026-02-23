@@ -3,10 +3,9 @@
 Goal: Engine can compute deterministic preview for pay_run.
 """
 
-import pytest
 from decimal import Decimal
-from uuid import UUID
 
+import pytest
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,12 +14,10 @@ from payroll_engine.services.pay_run_service import PayRunService
 from payroll_engine.services.state_machine import PayRunStateMachine
 
 from .conftest import (
-    DEMO_TENANT_ID,
-    DRAFT_PAY_RUN_ID,
     ALICE_EMPLOYEE_ID,
     BOB_EMPLOYEE_ID,
+    DRAFT_PAY_RUN_ID,
 )
-
 
 pytestmark = pytest.mark.asyncio
 

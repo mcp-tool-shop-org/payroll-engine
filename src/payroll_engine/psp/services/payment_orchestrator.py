@@ -20,8 +20,8 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
-from payroll_engine.psp.providers.base import PaymentRailProvider, SubmitResult
-from payroll_engine.psp.services.ledger_service import LedgerService, AsyncLedgerService
+from payroll_engine.psp.providers.base import PaymentRailProvider
+from payroll_engine.psp.services.ledger_service import AsyncLedgerService, LedgerService
 
 
 @dataclass(frozen=True)

@@ -15,13 +15,12 @@ It only reads events and emits advisory recommendations.
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional
 from uuid import UUID, uuid4
 
 from payroll_engine.psp.ai.base import (
     AdvisoryConfig,
-    FundingRiskAdvisory,
     ContributingFactor,
+    FundingRiskAdvisory,
 )
 from payroll_engine.psp.ai.features import (
     FeatureExtractor,
@@ -58,7 +57,7 @@ class FundingRiskAdvisor:
         self,
         config: AdvisoryConfig,
         event_store,
-        feature_extractor: Optional[FeatureExtractor] = None,
+        feature_extractor: FeatureExtractor | None = None,
     ):
         """
         Initialize funding risk advisor.
@@ -100,9 +99,9 @@ class FundingRiskAdvisor:
         tenant_id: UUID,
         payroll_amount: Decimal,
         payment_count: int,
-        scheduled_date: Optional[datetime] = None,
-        payroll_batch_id: Optional[UUID] = None,
-    ) -> Optional[FundingRiskAdvisory]:
+        scheduled_date: datetime | None = None,
+        payroll_batch_id: UUID | None = None,
+    ) -> FundingRiskAdvisory | None:
         """
         Analyze funding risk for an upcoming payroll.
 
@@ -175,7 +174,7 @@ class FundingRiskAdvisor:
         self,
         tenant_id: UUID,
         lookforward_days: int = 7,
-    ) -> Optional[FundingRiskAdvisory]:
+    ) -> FundingRiskAdvisory | None:
         """
         Analyze general funding risk for a tenant.
 
@@ -296,6 +295,6 @@ class FundingRiskAdvisor:
 @dataclass
 class FundingRiskResult:
     """Result of funding risk analysis."""
-    advisory: Optional[FundingRiskAdvisory]
+    advisory: FundingRiskAdvisory | None
     features: FundingRiskFeatures
     raw_score: float

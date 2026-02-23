@@ -7,11 +7,11 @@ Available models:
 """
 
 from payroll_engine.psp.ai.models.rules_baseline import (
-    RulesBaselineReturnModel,
     RulesBaselineFundingRiskModel,
+    RulesBaselineReturnModel,
 )
 
 __all__ = [
-    "RulesBaselineReturnModel",
     "RulesBaselineFundingRiskModel",
+    "RulesBaselineReturnModel",
 ]

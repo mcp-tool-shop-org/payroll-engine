@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import date
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from payroll_engine.psp.providers.base import PaymentRailProvider, SettlementRecord
-from payroll_engine.psp.services.ledger_service import LedgerService, AsyncLedgerService
+from payroll_engine.psp.services.ledger_service import AsyncLedgerService, LedgerService
 
 
 @dataclass

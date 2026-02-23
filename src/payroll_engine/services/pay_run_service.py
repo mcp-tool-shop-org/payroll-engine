@@ -14,8 +14,6 @@ from payroll_engine.database import acquire_advisory_lock, release_advisory_lock
 from payroll_engine.models import (
     AuditEvent,
     PayRun,
-    PayRunEmployee,
-    PayStatement,
 )
 from payroll_engine.services.locking_service import LockingService
 from payroll_engine.services.state_machine import (

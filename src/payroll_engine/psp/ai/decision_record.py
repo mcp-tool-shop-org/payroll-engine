@@ -10,14 +10,12 @@ This enables:
 - Training data collection for future ML models
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-from decimal import Decimal
-from enum import Enum
-from typing import Any, Optional
-from uuid import UUID, uuid4
 import hashlib
 import json
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from uuid import UUID, uuid4
 
 
 class DecisionOutcome(Enum):
@@ -46,7 +44,7 @@ class AdvisoryDecisionRecord:
 
     # Timing
     advisory_generated_at: datetime
-    decision_made_at: Optional[datetime] = None
+    decision_made_at: datetime | None = None
 
     # Model info
     model_name: str = ""
@@ -63,9 +61,9 @@ class AdvisoryDecisionRecord:
 
     # Decision
     outcome: DecisionOutcome = DecisionOutcome.PENDING
-    actual_outcome: Optional[dict] = None  # What was actually chosen
-    override_reason: Optional[str] = None
-    decided_by: Optional[str] = None  # User ID or "policy:auto_high_confidence"
+    actual_outcome: dict | None = None  # What was actually chosen
+    override_reason: str | None = None
+    decided_by: str | None = None  # User ID or "policy:auto_high_confidence"
 
     # Tracking
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -74,7 +72,7 @@ class AdvisoryDecisionRecord:
     def mark_accepted(
         self,
         decided_by: str,
-        at: Optional[datetime] = None,
+        at: datetime | None = None,
     ) -> None:
         """Mark advisory as accepted."""
         self.outcome = DecisionOutcome.ACCEPTED
@@ -88,7 +86,7 @@ class AdvisoryDecisionRecord:
         actual_outcome: dict,
         reason: str,
         decided_by: str,
-        at: Optional[datetime] = None,
+        at: datetime | None = None,
     ) -> None:
         """Mark advisory as overridden with different decision."""
         self.outcome = DecisionOutcome.OVERRIDDEN
@@ -101,7 +99,7 @@ class AdvisoryDecisionRecord:
     def mark_auto_applied(
         self,
         policy_name: str,
-        at: Optional[datetime] = None,
+        at: datetime | None = None,
     ) -> None:
         """Mark advisory as auto-applied by policy."""
         self.outcome = DecisionOutcome.AUTO_APPLIED
@@ -110,7 +108,7 @@ class AdvisoryDecisionRecord:
         self.decision_made_at = at or datetime.utcnow()
         self.updated_at = datetime.utcnow()
 
-    def was_correct(self) -> Optional[bool]:
+    def was_correct(self) -> bool | None:
         """
         Check if advisory matched actual decision.
 

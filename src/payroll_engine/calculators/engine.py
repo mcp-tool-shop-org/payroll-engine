@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
@@ -25,16 +25,11 @@ from payroll_engine.calculators.types import (
 )
 from payroll_engine.config import get_settings
 from payroll_engine.models import (
-    DeductionCode,
-    EarningCode,
-    Employee,
     EmployeeDeduction,
     Employment,
     GarnishmentOrder,
     PayInputAdjustment,
-    PayPeriod,
     PayRun,
-    PayRunEmployee,
     TimeEntry,
 )
 
@@ -157,7 +152,7 @@ class PayrollEngine:
                     gross=Decimal("0"),
                     net=Decimal("0"),
                     lines=[],
-                    errors=[f"Unexpected error: {str(e)}"],
+                    errors=[f"Unexpected error: {e!s}"],
                     inputs_fingerprint="",
                     rules_fingerprint="",
                 )

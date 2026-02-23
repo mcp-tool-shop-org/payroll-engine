@@ -5,13 +5,10 @@ from __future__ import annotations
 import hashlib
 import json
 from decimal import ROUND_HALF_UP, Decimal
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from uuid import UUID
 
 from payroll_engine.calculators.types import LineCandidate, LineType
-
-if TYPE_CHECKING:
-    pass
 
 
 class LineItemBuilder:

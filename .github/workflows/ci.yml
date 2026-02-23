@@ -149,6 +149,7 @@ jobs:
           pytest tests/ -v \
             --ignore=tests/psp/test_red_team_scenarios.py \
             --ignore=tests/psp/integration/ \
+            --ignore=tests/integration/ \
             -x --tb=short
 
   # ===========================================================================
