@@ -62,6 +62,8 @@ async def psp_db(async_db: AsyncSession) -> AsyncGenerator[AsyncSession, None]:
     """Clean PSP tables before each test."""
     # Truncate PSP tables in dependency order
     psp_tables = [
+        "psp_event_subscription",
+        "psp_domain_event",
         "psp_settlement_link",
         "psp_settlement_event",
         "psp_reservation",
@@ -73,6 +75,7 @@ async def psp_db(async_db: AsyncSession) -> AsyncGenerator[AsyncSession, None]:
         "funding_request",
         "payment_attempt",
         "payment_instruction",
+        "liability_event",
         "third_party_obligation",
         "tax_liability",
     ]
@@ -91,6 +94,8 @@ async def psp_db(async_db: AsyncSession) -> AsyncGenerator[AsyncSession, None]:
 def psp_sync_db(sync_db: Session) -> Generator[Session, None, None]:
     """Clean PSP tables before each test (sync version)."""
     psp_tables = [
+        "psp_event_subscription",
+        "psp_domain_event",
         "psp_settlement_link",
         "psp_settlement_event",
         "psp_reservation",
@@ -102,6 +107,7 @@ def psp_sync_db(sync_db: Session) -> Generator[Session, None, None]:
         "funding_request",
         "payment_attempt",
         "payment_instruction",
+        "liability_event",
         "third_party_obligation",
         "tax_liability",
     ]

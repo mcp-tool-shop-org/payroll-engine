@@ -297,16 +297,16 @@ CREATE TRIGGER trg_link_reversal
 -- =============================================================================
 
 -- Amount must be positive
-ALTER TABLE psp_balance_reservation
+ALTER TABLE psp_reservation
     DROP CONSTRAINT IF EXISTS chk_reservation_amount_positive;
-ALTER TABLE psp_balance_reservation
+ALTER TABLE psp_reservation
     ADD CONSTRAINT chk_reservation_amount_positive
     CHECK (amount > 0);
 
 -- Status must be valid
-ALTER TABLE psp_balance_reservation
+ALTER TABLE psp_reservation
     DROP CONSTRAINT IF EXISTS chk_reservation_status_valid;
-ALTER TABLE psp_balance_reservation
+ALTER TABLE psp_reservation
     ADD CONSTRAINT chk_reservation_status_valid
     CHECK (status IN ('active', 'consumed', 'expired', 'released'));
 
@@ -318,16 +318,16 @@ ALTER TABLE psp_balance_reservation
 -- =============================================================================
 
 -- Amount must be positive
-ALTER TABLE psp_funding_request
+ALTER TABLE funding_request
     DROP CONSTRAINT IF EXISTS chk_funding_request_amount_positive;
-ALTER TABLE psp_funding_request
+ALTER TABLE funding_request
     ADD CONSTRAINT chk_funding_request_amount_positive
     CHECK (amount > 0);
 
 -- Status must be valid
-ALTER TABLE psp_funding_request
+ALTER TABLE funding_request
     DROP CONSTRAINT IF EXISTS chk_funding_request_status_valid;
-ALTER TABLE psp_funding_request
+ALTER TABLE funding_request
     ADD CONSTRAINT chk_funding_request_status_valid
     CHECK (status IN (
         'pending',
@@ -347,7 +347,7 @@ ALTER TABLE liability_event
     DROP CONSTRAINT IF EXISTS chk_liability_amount_positive;
 ALTER TABLE liability_event
     ADD CONSTRAINT chk_liability_amount_positive
-    CHECK (amount > 0);
+    CHECK (loss_amount > 0);
 
 -- Recovery status must be valid
 ALTER TABLE liability_event

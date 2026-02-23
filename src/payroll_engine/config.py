@@ -60,3 +60,7 @@ class Settings:
 def get_settings() -> Settings:
     """Get cached settings instance."""
     return Settings.from_env()
+
+
+# Module-level convenience alias
+settings = get_settings()
