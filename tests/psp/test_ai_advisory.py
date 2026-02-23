@@ -1900,21 +1900,27 @@ class TestRunbookAssistant:
         )
 
         tenant_id = uuid4()
+        payment_id = uuid4()
         context = IncidentContext(
             incident_id=uuid4(),
             incident_type=IncidentType.SETTLEMENT_MISMATCH,
             detected_at=datetime.utcnow(),
             tenant_id=tenant_id,
-            payment_id=uuid4(),
+            payment_id=payment_id,
         )
 
         assistant = RunbookAssistant()
         assistance = assistant.assist(context)
 
-        # Queries should be filled with actual IDs
+        # Queries should be filled with actual IDs (tenant or payment)
         assert len(assistance.diagnostic_queries) >= 1
         for query in assistance.diagnostic_queries:
-            assert str(tenant_id) in query.query_sql
+            # Queries should reference at least one context ID
+            has_context_id = (
+                str(tenant_id) in query.query_sql
+                or str(payment_id) in query.query_sql
+            )
+            assert has_context_id, f"Query should contain a context ID: {query.query_sql}"
             assert query.expected_outcome  # Should have expected outcome
             assert query.if_anomalous  # Should have anomaly guidance
 

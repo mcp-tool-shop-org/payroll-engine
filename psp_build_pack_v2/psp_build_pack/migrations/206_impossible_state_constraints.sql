@@ -65,6 +65,7 @@ ALTER TABLE payment_instruction
 ALTER TABLE payment_instruction
     ADD CONSTRAINT chk_payment_instruction_status_valid
     CHECK (status IN (
+        'created',
         'pending',
         'submitted',
         'accepted',
@@ -252,6 +253,25 @@ ALTER TABLE psp_ledger_entry
 CREATE UNIQUE INDEX IF NOT EXISTS idx_ledger_entry_reversed_once
     ON psp_ledger_entry (reversed_by_entry_id)
     WHERE reversed_by_entry_id IS NOT NULL;
+
+-- Relax append-only trigger to allow the reversal linkage UPDATE
+CREATE OR REPLACE FUNCTION psp_ledger_entry_append_only()
+RETURNS trigger AS $$
+BEGIN
+    -- Allow updates that only set reversed_by_entry_id (from reversal trigger)
+    IF TG_OP = 'UPDATE'
+       AND OLD.reversed_by_entry_id IS NULL
+       AND NEW.reversed_by_entry_id IS NOT NULL
+       -- Everything else must remain unchanged
+       AND OLD.tenant_id = NEW.tenant_id
+       AND OLD.amount = NEW.amount
+       AND OLD.entry_type = NEW.entry_type
+    THEN
+        RETURN NEW;
+    END IF;
+    RAISE EXCEPTION 'psp_ledger_entry is append-only; use reversal entries';
+END;
+$$ LANGUAGE plpgsql;
 
 -- Function to mark original entry when reversal is created
 CREATE OR REPLACE FUNCTION link_reversal_to_original()

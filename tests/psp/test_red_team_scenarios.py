@@ -15,7 +15,7 @@ These scenarios represent real-world fraud patterns and system abuse.
 The tests ensure invariants hold under adversarial conditions.
 """
 
-from datetime import date, datetime
+from datetime import date
 from decimal import Decimal
 from uuid import uuid4
 
@@ -212,7 +212,7 @@ class TestRaceConditions:
         """Reservations should prevent double-allocation of funds."""
         accounts = test_data.create_ledger_accounts(psp_sync_db)
         ledger = LedgerService(psp_sync_db)
-        funding_gate = FundingGateService(psp_sync_db, ledger)
+        funding_gate = FundingGateService(psp_sync_db)
         psp_sync_db.commit()
 
         account_id = accounts["client_funding_clearing"]
@@ -282,7 +282,7 @@ class TestCrossTenantAttacks:
         attacker_tenant_id = uuid4()
         balance = ledger.get_balance(
             tenant_id=attacker_tenant_id,
-            account_id=accounts["client_funding_clearing"],
+            ledger_account_id=accounts["client_funding_clearing"],
         )
 
         # Should return zero - account doesn't exist for attacker tenant
@@ -317,7 +317,7 @@ class TestCrossTenantAttacks:
         # It won't affect victim's balance because tenant_id is part of query
         victim_balance = ledger.get_balance(
             tenant_id=test_data.tenant_id,
-            account_id=accounts["client_funding_clearing"],
+            ledger_account_id=accounts["client_funding_clearing"],
         )
         # Balance should be 0 (no legitimate funding)
         assert victim_balance.available == Decimal("0.00")
