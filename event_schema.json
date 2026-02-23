@@ -2,8 +2,40 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "PSP Domain Event Schema Baseline",
   "description": "Baseline schema for event compatibility checking. DO NOT REMOVE fields.",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "events": {
+    "FundingRequested": {
+      "description": "Emitted when a funding request is submitted for evaluation",
+      "category": "funding",
+      "payload": {
+        "required": ["batch_id", "amount"],
+        "optional": ["requested_at"]
+      }
+    },
+    "FundingApproved": {
+      "description": "Emitted when funding is approved",
+      "category": "funding",
+      "payload": {
+        "required": ["batch_id"],
+        "optional": ["reservation_id", "approved_at"]
+      }
+    },
+    "FundingBlocked": {
+      "description": "Emitted when funding is blocked due to insufficient funds or policy",
+      "category": "funding",
+      "payload": {
+        "required": ["batch_id", "reason"],
+        "optional": ["shortfall_amount", "policy_name"]
+      }
+    },
+    "FundingInsufficientFunds": {
+      "description": "Emitted when funding fails due to insufficient funds (pay gate)",
+      "category": "funding",
+      "payload": {
+        "required": ["funding_request_id", "requested_amount", "available_balance", "shortfall"],
+        "optional": ["gate_evaluation_id"]
+      }
+    },
     "PaymentInstructionCreated": {
       "description": "Emitted when a payment instruction is created",
       "category": "payment",
@@ -52,6 +84,14 @@
         "optional": ["error_message", "retry_after"]
       }
     },
+    "PaymentCanceled": {
+      "description": "Emitted when a payment is canceled before settlement",
+      "category": "payment",
+      "payload": {
+        "required": ["instruction_id", "canceled_by", "cancel_reason"],
+        "optional": ["was_submitted"]
+      }
+    },
     "LedgerEntryPosted": {
       "description": "Emitted when a ledger entry is posted",
       "category": "ledger",
@@ -84,28 +124,36 @@
         "optional": ["release_type", "released_at"]
       }
     },
-    "FundingRequested": {
-      "description": "Emitted when funding is requested for a batch",
-      "category": "funding",
+    "SettlementReceived": {
+      "description": "Emitted when a settlement record is received from a provider",
+      "category": "settlement",
       "payload": {
-        "required": ["batch_id", "amount"],
-        "optional": ["requested_at"]
+        "required": ["settlement_event_id", "bank_account_id", "amount", "external_trace_id"],
+        "optional": ["rail", "direction", "effective_date", "status"]
       }
     },
-    "FundingApproved": {
-      "description": "Emitted when funding is approved",
-      "category": "funding",
+    "SettlementMatched": {
+      "description": "Emitted when a settlement is matched to a payment instruction",
+      "category": "settlement",
       "payload": {
-        "required": ["batch_id"],
-        "optional": ["reservation_id", "approved_at"]
+        "required": ["settlement_event_id", "payment_instruction_id"],
+        "optional": ["payment_attempt_id", "match_method"]
       }
     },
-    "FundingBlocked": {
-      "description": "Emitted when funding is blocked due to insufficient funds or policy",
-      "category": "funding",
+    "SettlementUnmatched": {
+      "description": "Emitted when a settlement could not be matched to any instruction",
+      "category": "settlement",
       "payload": {
-        "required": ["batch_id", "reason"],
-        "optional": ["shortfall_amount", "policy_name"]
+        "required": ["settlement_event_id", "external_trace_id", "amount"],
+        "optional": ["direction", "reason"]
+      }
+    },
+    "SettlementStatusChanged": {
+      "description": "Emitted when a settlement status changes",
+      "category": "settlement",
+      "payload": {
+        "required": ["settlement_event_id", "previous_status", "new_status"],
+        "optional": ["change_reason", "return_code", "requires_reversal"]
       }
     },
     "LiabilityClassified": {
@@ -116,44 +164,52 @@
         "optional": ["error_origin", "recovery_path", "amount"]
       }
     },
-    "ReturnAdvisoryGenerated": {
-      "description": "Emitted when AI generates a return root-cause advisory (advisory only, no action taken)",
-      "category": "advisory",
+    "LiabilityRecoveryStarted": {
+      "description": "Emitted when recovery process starts for a liability",
+      "category": "liability",
       "payload": {
-        "required": ["advisory_id", "payment_id", "return_code", "suggested_error_origin", "confidence"],
-        "optional": ["suggested_liability_party", "suggested_recovery_path", "model_name", "model_version", "feature_schema_hash", "contributing_factors", "explanation"]
+        "required": ["liability_event_id", "recovery_path", "target_amount"],
+        "optional": ["recovery_method"]
       }
     },
-    "FundingRiskAdvisoryGenerated": {
-      "description": "Emitted when AI generates a funding risk advisory (advisory only, no action taken)",
-      "category": "advisory",
+    "LiabilityRecovered": {
+      "description": "Emitted when liability is successfully recovered",
+      "category": "liability",
       "payload": {
-        "required": ["advisory_id", "risk_score", "risk_band"],
-        "optional": ["payroll_batch_id", "predicted_amount", "suggested_reserve_buffer", "model_name", "model_version", "feature_schema_hash", "contributing_factors", "explanation"]
+        "required": ["liability_event_id", "recovered_amount", "recovery_method"],
+        "optional": ["recovery_reference"]
       }
     },
-    "AIAdvisoryReportGenerated": {
-      "description": "Emitted when AI generates an advisory insights report (weekly/daily analysis)",
-      "category": "advisory",
+    "LiabilityWrittenOff": {
+      "description": "Emitted when liability is written off as unrecoverable",
+      "category": "liability",
       "payload": {
-        "required": ["report_id", "period_start", "period_end", "total_advisories", "overall_accuracy"],
-        "optional": ["insight_count", "critical_insights", "warning_insights", "by_return_code", "by_tenant", "by_model_version"]
+        "required": ["liability_event_id", "written_off_amount", "write_off_reason"],
+        "optional": ["approved_by", "accounting_reference"]
       }
     },
-    "TenantRiskProfileGenerated": {
-      "description": "Emitted when AI generates a tenant risk profile (advisory only, no action taken)",
-      "category": "advisory",
+    "ReconciliationStarted": {
+      "description": "Emitted when a reconciliation job starts",
+      "category": "reconciliation",
       "payload": {
-        "required": ["profile_id", "tenant_id", "risk_level", "risk_score"],
-        "optional": ["risk_trend", "requires_review", "requires_immediate_action", "signal_count", "critical_signals", "component_scores", "recommendations"]
+        "required": ["reconciliation_id", "reconciliation_date", "bank_account_id"],
+        "optional": ["provider"]
       }
     },
-    "RunbookAssistanceGenerated": {
-      "description": "Emitted when AI generates runbook assistance for an incident (advisory only, no action taken)",
-      "category": "advisory",
+    "ReconciliationCompleted": {
+      "description": "Emitted when a reconciliation job completes successfully",
+      "category": "reconciliation",
       "payload": {
-        "required": ["assistance_id", "incident_id", "incident_type", "runbook_name"],
-        "optional": ["query_count", "cause_count", "step_count", "estimated_severity", "warnings"]
+        "required": ["reconciliation_id", "reconciliation_date", "records_processed"],
+        "optional": ["records_matched", "records_created", "records_failed", "unmatched_count"]
+      }
+    },
+    "ReconciliationFailed": {
+      "description": "Emitted when a reconciliation job fails",
+      "category": "reconciliation",
+      "payload": {
+        "required": ["reconciliation_id", "error_code", "error_message"],
+        "optional": ["reconciliation_date", "records_processed_before_failure"]
       }
     }
   },

@@ -3,8 +3,31 @@ name: CI
 on:
   push:
     branches: [main, develop]
+    paths:
+      - "pyproject.toml"
+      - "src/**"
+      - "tests/**"
+      - "scripts/**"
+      - "psp_build_pack_v2/**"
+      - "examples/**"
+      - "event_schema.json"
+      - ".github/workflows/**"
   pull_request:
     branches: [main, develop]
+    paths:
+      - "pyproject.toml"
+      - "src/**"
+      - "tests/**"
+      - "scripts/**"
+      - "psp_build_pack_v2/**"
+      - "examples/**"
+      - "event_schema.json"
+      - ".github/workflows/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   PYTHON_VERSION: "3.11"

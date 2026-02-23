@@ -37,6 +37,32 @@ def get_current_events() -> dict:
     # This should be generated from actual code or maintained separately
     # For CI, we compare against event_schema.json
     return {
+        # Funding events
+        "FundingRequested": {
+            "payload": {
+                "required": ["batch_id", "amount"],
+                "optional": ["requested_at"],
+            }
+        },
+        "FundingApproved": {
+            "payload": {
+                "required": ["batch_id"],
+                "optional": ["reservation_id", "approved_at"],
+            }
+        },
+        "FundingBlocked": {
+            "payload": {
+                "required": ["batch_id", "reason"],
+                "optional": ["shortfall_amount", "policy_name"],
+            }
+        },
+        "FundingInsufficientFunds": {
+            "payload": {
+                "required": ["funding_request_id", "requested_amount", "available_balance", "shortfall"],
+                "optional": ["gate_evaluation_id"],
+            }
+        },
+        # Payment events
         "PaymentInstructionCreated": {
             "payload": {
                 "required": ["instruction_id", "amount"],
@@ -73,6 +99,13 @@ def get_current_events() -> dict:
                 "optional": ["error_message", "retry_after"],
             }
         },
+        "PaymentCanceled": {
+            "payload": {
+                "required": ["instruction_id", "canceled_by", "cancel_reason"],
+                "optional": ["was_submitted"],
+            }
+        },
+        # Ledger events
         "LedgerEntryPosted": {
             "payload": {
                 "required": ["entry_id", "debit_account", "credit_account", "amount"],
@@ -85,6 +118,7 @@ def get_current_events() -> dict:
                 "optional": ["reason"],
             }
         },
+        # Reservation events
         "ReservationCreated": {
             "payload": {
                 "required": ["reservation_id", "account_id", "amount"],
@@ -97,28 +131,73 @@ def get_current_events() -> dict:
                 "optional": ["release_type", "released_at"],
             }
         },
-        "FundingRequested": {
+        # Settlement events
+        "SettlementReceived": {
             "payload": {
-                "required": ["batch_id", "amount"],
-                "optional": ["requested_at"],
+                "required": ["settlement_event_id", "bank_account_id", "amount", "external_trace_id"],
+                "optional": ["rail", "direction", "effective_date", "status"],
             }
         },
-        "FundingApproved": {
+        "SettlementMatched": {
             "payload": {
-                "required": ["batch_id"],
-                "optional": ["reservation_id", "approved_at"],
+                "required": ["settlement_event_id", "payment_instruction_id"],
+                "optional": ["payment_attempt_id", "match_method"],
             }
         },
-        "FundingBlocked": {
+        "SettlementUnmatched": {
             "payload": {
-                "required": ["batch_id", "reason"],
-                "optional": ["shortfall_amount", "policy_name"],
+                "required": ["settlement_event_id", "external_trace_id", "amount"],
+                "optional": ["direction", "reason"],
             }
         },
+        "SettlementStatusChanged": {
+            "payload": {
+                "required": ["settlement_event_id", "previous_status", "new_status"],
+                "optional": ["change_reason", "return_code", "requires_reversal"],
+            }
+        },
+        # Liability events
         "LiabilityClassified": {
             "payload": {
                 "required": ["instruction_id", "return_code", "liability_party"],
                 "optional": ["error_origin", "recovery_path", "amount"],
+            }
+        },
+        "LiabilityRecoveryStarted": {
+            "payload": {
+                "required": ["liability_event_id", "recovery_path", "target_amount"],
+                "optional": ["recovery_method"],
+            }
+        },
+        "LiabilityRecovered": {
+            "payload": {
+                "required": ["liability_event_id", "recovered_amount", "recovery_method"],
+                "optional": ["recovery_reference"],
+            }
+        },
+        "LiabilityWrittenOff": {
+            "payload": {
+                "required": ["liability_event_id", "written_off_amount", "write_off_reason"],
+                "optional": ["approved_by", "accounting_reference"],
+            }
+        },
+        # Reconciliation events
+        "ReconciliationStarted": {
+            "payload": {
+                "required": ["reconciliation_id", "reconciliation_date", "bank_account_id"],
+                "optional": ["provider"],
+            }
+        },
+        "ReconciliationCompleted": {
+            "payload": {
+                "required": ["reconciliation_id", "reconciliation_date", "records_processed"],
+                "optional": ["records_matched", "records_created", "records_failed", "unmatched_count"],
+            }
+        },
+        "ReconciliationFailed": {
+            "payload": {
+                "required": ["reconciliation_id", "error_code", "error_message"],
+                "optional": ["reconciliation_date", "records_processed_before_failure"],
             }
         },
     }
