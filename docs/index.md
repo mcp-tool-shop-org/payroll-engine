@@ -61,6 +61,6 @@ Welcome to Payroll Engine documentation. Start here to find what you need.
 
 - **Quickstart**: See [README.md](../README.md#quickstart)
 - **API Reference**: [public_api.md](public_api.md)
-- **Report a Bug**: [GitHub Issues](https://github.com/mcp-tool-shop/payroll-engine/issues/new?template=bug_report.yml)
-- **Ask a Question**: [GitHub Discussions](https://github.com/mcp-tool-shop/payroll-engine/discussions)
+- **Report a Bug**: [GitHub Issues](https://github.com/mcp-tool-shop-org/payroll-engine/issues/new?template=bug_report.yml)
+- **Ask a Question**: [GitHub Discussions](https://github.com/mcp-tool-shop-org/payroll-engine/discussions)
 - **Security Issues**: security@payroll-engine.com
