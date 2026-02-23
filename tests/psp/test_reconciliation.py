@@ -264,6 +264,9 @@ class TestSettlementStatusChanges:
             tenant_id=test_data.tenant_id,
         )
 
+        # Reconciliation must succeed without errors
+        assert result.success, f"Reconciliation failed: {result.errors}"
+
         # Settlement event status should be updated
         new_status = psp_sync_db.execute(
             text("SELECT status FROM psp_settlement_event WHERE psp_settlement_event_id = :id"),
