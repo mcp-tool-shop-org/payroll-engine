@@ -225,15 +225,15 @@ class TestRulesBaselineReturnModel:
             assert origin == "employee", f"Code {code} should be employee origin"
             assert confidence > 0.3, f"Code {code} should have reasonable confidence"
 
-    def test_provider_fault_codes_attributed_to_provider(self):
-        """R17+ should suggest provider origin."""
+    def test_psp_fault_codes_attributed_to_psp(self):
+        """R17-R24 are processing errors on PSP side (file format, dates, dupes)."""
         model = RulesBaselineReturnModel()
 
         for code in ["R17", "R18", "R19", "R24"]:
             features = self._make_features(return_code=code)
             origin, _, _, confidence, _, _ = model.predict(features)
 
-            assert origin == "provider", f"Code {code} should be provider origin"
+            assert origin == "psp", f"Code {code} should be psp origin"
 
     def test_new_account_with_r01_increases_employee_confidence(self):
         """New account + R01 should strongly suggest employee fault."""

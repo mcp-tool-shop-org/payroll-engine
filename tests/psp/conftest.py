@@ -12,8 +12,11 @@ from sqlalchemy.orm import Session
 
 from payroll_engine.config import settings
 
-# Test database URLs
-TEST_DATABASE_URL_ASYNC = settings.database_url.replace("payroll_dev", "payroll_test")
+# Test database URLs — replace only the database name (last path segment),
+# NOT the password which may also contain "payroll_dev".
+_base_url = settings.database_url
+_url_prefix, _db_name = _base_url.rsplit("/", 1)
+TEST_DATABASE_URL_ASYNC = f"{_url_prefix}/{_db_name.replace('payroll_dev', 'payroll_test')}"
 TEST_DATABASE_URL_SYNC = TEST_DATABASE_URL_ASYNC.replace("postgresql+asyncpg", "postgresql")
 
 

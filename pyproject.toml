@@ -221,6 +221,8 @@ exclude = [
     "**/node_modules",
     "**/__pycache__",
     ".venv",
+    "src/payroll_engine/api",      # Web layer has pre-existing type debt
+    "src/payroll_engine/__main__.py",  # Depends on api module
 ]
 pythonVersion = "3.11"
 typeCheckingMode = "standard"

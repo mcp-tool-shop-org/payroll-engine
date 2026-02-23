@@ -188,8 +188,11 @@ jobs:
           pip install -e ".[dev]"
           pip install psycopg2-binary
 
-      - name: Apply migrations
-        run: python scripts/migrate.py
+      - name: Create test database and apply migrations
+        run: |
+          PGPASSWORD=payroll_dev psql -h localhost -U payroll -d payroll_dev -c "CREATE DATABASE payroll_test;" || true
+          python scripts/migrate.py
+          DATABASE_URL=postgresql://payroll:payroll_dev@localhost:5432/payroll_test python scripts/migrate.py
 
       - name: Run PSP integration tests
         run: |
@@ -296,8 +299,11 @@ jobs:
           pip install -e ".[dev]"
           pip install psycopg2-binary
 
-      - name: Apply migrations
-        run: python scripts/migrate.py
+      - name: Create test database and apply migrations
+        run: |
+          PGPASSWORD=payroll_dev psql -h localhost -U payroll -d payroll_dev -c "CREATE DATABASE payroll_test;" || true
+          python scripts/migrate.py
+          DATABASE_URL=postgresql://payroll:payroll_dev@localhost:5432/payroll_test python scripts/migrate.py
 
       - name: Run red team tests
         run: |
