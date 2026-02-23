@@ -78,14 +78,18 @@ ALTER TABLE payment_instruction
 ALTER TABLE payment_instruction
     ADD CONSTRAINT chk_payment_instruction_status_valid
     CHECK (status IN (
+        -- Original 202 statuses
         'created',
-        'pending',
+        'queued',
         'submitted',
         'accepted',
         'settled',
         'failed',
-        'returned',
-        'canceled'
+        'reversed',
+        'canceled',
+        -- Additional 206 statuses
+        'pending',
+        'returned'
     ));
 
 -- Purpose must be valid
@@ -94,14 +98,20 @@ ALTER TABLE payment_instruction
 ALTER TABLE payment_instruction
     ADD CONSTRAINT chk_payment_instruction_purpose_valid
     CHECK (purpose IN (
+        -- Original 202 types (production code uses these)
         'employee_net',
+        'tax_remit',
+        'third_party',
+        'refund',
+        'fee',
+        'funding_debit',
+        -- Additional 206 types
         'employee_expense',
         'vendor_payment',
         'tax_payment',
         'garnishment',
         'child_support',
         'fee_payment',
-        'refund',
         'correction'
     ));
 
@@ -111,7 +121,12 @@ ALTER TABLE payment_instruction
 ALTER TABLE payment_instruction
     ADD CONSTRAINT chk_payment_instruction_payee_type_valid
     CHECK (payee_type IN (
+        -- Original 202 types (production code uses these)
         'employee',
+        'agency',
+        'provider',
+        'client',
+        -- Additional 206 types
         'vendor',
         'tax_authority',
         'garnishment_agency',
@@ -151,10 +166,15 @@ ALTER TABLE psp_settlement_event
 ALTER TABLE psp_settlement_event
     ADD CONSTRAINT chk_settlement_status_valid
     CHECK (status IN (
-        'pending',
+        -- Original 201 statuses
+        'created',
         'submitted',
         'accepted',
         'settled',
+        'failed',
+        'reversed',
+        -- Additional 206 statuses
+        'pending',
         'returned',
         'rejected',
         'canceled'
@@ -175,12 +195,15 @@ CREATE OR REPLACE FUNCTION validate_payment_instruction_status_transition()
 RETURNS TRIGGER AS $$
 DECLARE
     valid_transitions JSONB := '{
+        "created": ["queued", "pending", "submitted", "canceled"],
+        "queued": ["submitted", "canceled"],
         "pending": ["submitted", "canceled"],
         "submitted": ["accepted", "failed", "canceled"],
-        "accepted": ["settled", "failed", "returned"],
-        "settled": ["returned"],
+        "accepted": ["settled", "failed", "returned", "reversed"],
+        "settled": ["returned", "reversed"],
         "failed": [],
         "returned": [],
+        "reversed": [],
         "canceled": []
     }'::JSONB;
     allowed_targets JSONB;
@@ -214,11 +237,14 @@ CREATE OR REPLACE FUNCTION validate_settlement_status_transition()
 RETURNS TRIGGER AS $$
 DECLARE
     valid_transitions JSONB := '{
+        "created": ["pending", "submitted", "accepted", "settled", "failed", "canceled"],
         "pending": ["submitted", "accepted", "settled", "rejected", "canceled"],
-        "submitted": ["accepted", "settled", "rejected"],
-        "accepted": ["settled", "returned", "rejected"],
-        "settled": ["returned"],
+        "submitted": ["accepted", "settled", "failed", "rejected"],
+        "accepted": ["settled", "returned", "reversed", "failed", "rejected"],
+        "settled": ["returned", "reversed"],
+        "failed": [],
         "returned": [],
+        "reversed": [],
         "rejected": [],
         "canceled": []
     }'::JSONB;
@@ -389,11 +415,15 @@ ALTER TABLE liability_event
 ALTER TABLE liability_event
     ADD CONSTRAINT chk_liability_recovery_status_valid
     CHECK (recovery_status IN (
+        -- Values from RecoveryStatus enum in liability.py
         'pending',
         'in_progress',
-        'recovered',
         'partial',
+        'complete',
+        'failed',
         'written_off',
+        -- Additional values
+        'recovered',
         'disputed'
     ));
 
