@@ -5,6 +5,27 @@
 -- Philosophy: "Tests pass" < "You can't corrupt it at 2am"
 
 -- =============================================================================
+-- Drop original inline CHECK constraints from 201/202 before replacing them.
+-- PostgreSQL auto-names inline CHECKs as <table>_<column>_check.
+-- =============================================================================
+ALTER TABLE psp_ledger_entry DROP CONSTRAINT IF EXISTS psp_ledger_entry_entry_type_check;
+ALTER TABLE psp_ledger_entry DROP CONSTRAINT IF EXISTS psp_ledger_entry_amount_check;
+ALTER TABLE payment_instruction DROP CONSTRAINT IF EXISTS payment_instruction_status_check;
+ALTER TABLE payment_instruction DROP CONSTRAINT IF EXISTS payment_instruction_purpose_check;
+ALTER TABLE payment_instruction DROP CONSTRAINT IF EXISTS payment_instruction_payee_type_check;
+ALTER TABLE payment_instruction DROP CONSTRAINT IF EXISTS payment_instruction_direction_check;
+ALTER TABLE payment_instruction DROP CONSTRAINT IF EXISTS payment_instruction_amount_check;
+ALTER TABLE psp_settlement_event DROP CONSTRAINT IF EXISTS psp_settlement_event_status_check;
+ALTER TABLE psp_settlement_event DROP CONSTRAINT IF EXISTS psp_settlement_event_direction_check;
+ALTER TABLE psp_settlement_event DROP CONSTRAINT IF EXISTS psp_settlement_event_amount_check;
+ALTER TABLE psp_settlement_event DROP CONSTRAINT IF EXISTS psp_settlement_event_rail_check;
+ALTER TABLE psp_reservation DROP CONSTRAINT IF EXISTS psp_reservation_status_check;
+ALTER TABLE psp_reservation DROP CONSTRAINT IF EXISTS psp_reservation_amount_check;
+ALTER TABLE psp_reservation DROP CONSTRAINT IF EXISTS psp_reservation_reserve_type_check;
+ALTER TABLE payment_attempt DROP CONSTRAINT IF EXISTS payment_attempt_status_check;
+ALTER TABLE payment_attempt DROP CONSTRAINT IF EXISTS payment_attempt_rail_check;
+
+-- =============================================================================
 -- LEDGER ENTRY CONSTRAINTS
 -- =============================================================================
 
