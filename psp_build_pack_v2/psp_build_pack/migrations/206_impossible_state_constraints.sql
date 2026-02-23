@@ -247,7 +247,8 @@ ALTER TABLE psp_ledger_entry
 ALTER TABLE psp_ledger_entry
     ADD CONSTRAINT fk_ledger_entry_reversed_by
     FOREIGN KEY (reversed_by_entry_id)
-    REFERENCES psp_ledger_entry(psp_ledger_entry_id);
+    REFERENCES psp_ledger_entry(psp_ledger_entry_id)
+    DEFERRABLE INITIALLY DEFERRED;
 
 -- Prevent double-reversal: an entry can only be reversed once
 CREATE UNIQUE INDEX IF NOT EXISTS idx_ledger_entry_reversed_once

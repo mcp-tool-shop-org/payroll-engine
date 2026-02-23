@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import select
@@ -117,7 +118,7 @@ class PaymentService:
 
     async def get_batch_summary(
         self, payment_batch_id: UUID
-    ) -> dict[str, any]:
+    ) -> dict[str, Any]:
         """Get summary of a payment batch."""
         batch_result = await self.session.execute(
             select(PaymentBatch)

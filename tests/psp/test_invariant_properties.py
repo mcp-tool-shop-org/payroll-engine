@@ -249,7 +249,13 @@ class TestLedgerInvariants:
 
     @given(
         amounts=st.lists(
-            st.decimals(min_value=Decimal("0.01"), max_value=Decimal("1000000")),
+            st.decimals(
+                min_value=Decimal("0.01"),
+                max_value=Decimal("1000000"),
+                places=2,
+                allow_nan=False,
+                allow_infinity=False,
+            ),
             min_size=1,
             max_size=100,
         )
@@ -266,7 +272,7 @@ class TestLedgerInvariants:
         state.create_account(account_b)
 
         # Fund account_a so it can send
-        funding = sum(amounts) + Decimal("1")
+        funding = sum(amounts, Decimal("0")) + Decimal("1")
         state.accounts[account_a] = funding
 
         # Post entries
@@ -278,7 +284,13 @@ class TestLedgerInvariants:
         total_balance = sum(state.accounts.values())
         assert total_balance == funding
 
-    @given(amount=st.decimals(min_value=Decimal("0.01"), max_value=Decimal("1000000")))
+    @given(amount=st.decimals(
+        min_value=Decimal("0.01"),
+        max_value=Decimal("1000000"),
+        places=2,
+        allow_nan=False,
+        allow_infinity=False,
+    ))
     @settings(max_examples=50)
     def test_reversal_restores_balance(self, amount: Decimal):
         """Reversing an entry restores the original balances."""
@@ -302,7 +314,13 @@ class TestLedgerInvariants:
         assert state.get_balance(account_a) == original_a
         assert state.get_balance(account_b) == original_b
 
-    @given(amount=st.decimals(min_value=Decimal("0.01"), max_value=Decimal("1000000")))
+    @given(amount=st.decimals(
+        min_value=Decimal("0.01"),
+        max_value=Decimal("1000000"),
+        places=2,
+        allow_nan=False,
+        allow_infinity=False,
+    ))
     @settings(max_examples=50)
     def test_entry_cannot_be_reversed_twice(self, amount: Decimal):
         """An entry can only be reversed once."""
@@ -329,7 +347,13 @@ class TestReservationInvariants:
 
     @given(
         amounts=st.lists(
-            st.decimals(min_value=Decimal("0.01"), max_value=Decimal("1000")),
+            st.decimals(
+                min_value=Decimal("0.01"),
+                max_value=Decimal("1000"),
+                places=2,
+                allow_nan=False,
+                allow_infinity=False,
+            ),
             min_size=1,
             max_size=20,
         )
@@ -339,7 +363,7 @@ class TestReservationInvariants:
         """Available balance never exceeds total balance."""
         state = TestPSPState()
         account = uuid4()
-        state.accounts[account] = sum(amounts)
+        state.accounts[account] = sum(amounts, Decimal("0"))
 
         # Create reservations for half the amounts
         for i, amount in enumerate(amounts):
@@ -349,7 +373,13 @@ class TestReservationInvariants:
         # Invariant
         assert state.get_available_balance(account) <= state.get_balance(account)
 
-    @given(amount=st.decimals(min_value=Decimal("0.01"), max_value=Decimal("1000")))
+    @given(amount=st.decimals(
+        min_value=Decimal("0.01"),
+        max_value=Decimal("1000"),
+        places=2,
+        allow_nan=False,
+        allow_infinity=False,
+    ))
     @settings(max_examples=50)
     def test_released_reservation_frees_balance(self, amount: Decimal):
         """Releasing a reservation increases available balance."""

@@ -108,6 +108,9 @@ class TaxCalculator:
 
         # Get federal jurisdiction
         fed_jurisdiction = await self._get_jurisdiction("FED", "FED")
+        if fed_jurisdiction is None:
+            ctx.errors.append("Federal jurisdiction not found")
+            return lines
 
         # Federal income tax
         fed_profile = next(

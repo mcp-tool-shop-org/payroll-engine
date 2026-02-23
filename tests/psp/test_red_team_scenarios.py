@@ -199,12 +199,48 @@ class TestRaceConditions:
         )
         assert balance.available == Decimal("100000.00")
 
-    @pytest.mark.skip(reason="API changed: evaluate_pay_gate now requires pay_run_id, needs test rewrite")
     def test_pay_gate_prevents_overdraft_under_load(
         self, psp_sync_db: Session, test_data: PSPTestData
     ):
         """Pay gate should prevent overdrafts even under concurrent requests."""
-        pass
+        accounts = test_data.create_ledger_accounts(psp_sync_db)
+        ledger = LedgerService(psp_sync_db)
+        funding_gate = FundingGateService(psp_sync_db)
+        psp_sync_db.commit()
+
+        account_id = accounts["client_funding_clearing"]
+
+        # Seed $5,000
+        ledger.post_entry(
+            tenant_id=test_data.tenant_id,
+            legal_entity_id=test_data.legal_entity_id,
+            entry_type="funding_received",
+            debit_account_id=accounts["psp_settlement_clearing"],
+            credit_account_id=account_id,
+            amount=Decimal("5000.00"),
+            source_type="test",
+            source_id=uuid4(),
+            idempotency_key=f"seed_{uuid4().hex[:8]}",
+        )
+        psp_sync_db.commit()
+
+        # Create pay run data requiring $10,000 (exceeds $5,000 balance)
+        pay_run_id = test_data.create_pay_run_data(
+            psp_sync_db,
+            net_pay=Decimal("10000.00"),
+        )
+        psp_sync_db.commit()
+
+        # Pay gate should block — insufficient funds
+        result = funding_gate.evaluate_pay_gate(
+            tenant_id=test_data.tenant_id,
+            legal_entity_id=test_data.legal_entity_id,
+            pay_run_id=pay_run_id,
+            idempotency_key=f"pay_gate_{uuid4().hex[:8]}",
+        )
+
+        assert result.passed is False
+        assert result.shortfall > 0
 
     def test_reservation_prevents_double_allocation(
         self, psp_sync_db: Session, test_data: PSPTestData
@@ -249,8 +285,8 @@ class TestRaceConditions:
             tenant_id=test_data.tenant_id,
             ledger_account_id=account_id,
         )
-        # Available = 10000 balance - 8000 reserved = 2000
-        assert balance.available <= Decimal("2000.00")
+        # Unreserved = 10000 balance - 8000 reserved = 2000
+        assert balance.unreserved == Decimal("2000.00")
 
 
 class TestCrossTenantAttacks:
@@ -687,16 +723,73 @@ class TestPaymentRailAbuse:
 class TestFundingGateBypass:
     """Test attempts to bypass funding gates."""
 
-    @pytest.mark.skip(reason="API changed: evaluate_pay_gate now requires pay_run_id, needs test rewrite")
     def test_pay_gate_cannot_be_bypassed(
         self, psp_sync_db: Session, test_data: PSPTestData
     ):
         """Pay gate must always be evaluated - no bypass."""
-        pass
+        accounts = test_data.create_ledger_accounts(psp_sync_db)
+        ledger = LedgerService(psp_sync_db)
+        funding_gate = FundingGateService(psp_sync_db)
+        psp_sync_db.commit()
 
-    @pytest.mark.skip(reason="API changed: evaluate_commit_gate now requires pay_run_id, needs test rewrite")
+        # Create pay run with $5,000 requirement but NO funding
+        pay_run_id = test_data.create_pay_run_data(
+            psp_sync_db,
+            net_pay=Decimal("5000.00"),
+        )
+        psp_sync_db.commit()
+
+        # Pay gate should fail — no balance at all
+        result = funding_gate.evaluate_pay_gate(
+            tenant_id=test_data.tenant_id,
+            legal_entity_id=test_data.legal_entity_id,
+            pay_run_id=pay_run_id,
+            idempotency_key=f"pay_gate_{uuid4().hex[:8]}",
+        )
+
+        assert result.passed is False
+        assert result.shortfall == Decimal("5000.00")
+
     def test_commit_gate_strict_mode_enforced(
         self, psp_sync_db: Session, test_data: PSPTestData
     ):
         """Commit gate in strict mode fails on insufficient funds."""
-        pass
+        accounts = test_data.create_ledger_accounts(psp_sync_db)
+        ledger = LedgerService(psp_sync_db)
+        funding_gate = FundingGateService(psp_sync_db)
+        psp_sync_db.commit()
+
+        # Seed only $1,000
+        ledger.post_entry(
+            tenant_id=test_data.tenant_id,
+            legal_entity_id=test_data.legal_entity_id,
+            entry_type="funding_received",
+            debit_account_id=accounts["psp_settlement_clearing"],
+            credit_account_id=accounts["client_funding_clearing"],
+            amount=Decimal("1000.00"),
+            source_type="test",
+            source_id=uuid4(),
+            idempotency_key=f"seed_{uuid4().hex[:8]}",
+        )
+        psp_sync_db.commit()
+
+        # Create pay run requiring $10,000
+        pay_run_id = test_data.create_pay_run_data(
+            psp_sync_db,
+            net_pay=Decimal("10000.00"),
+        )
+        psp_sync_db.commit()
+
+        # Strict commit gate should block
+        result = funding_gate.evaluate_commit_gate(
+            tenant_id=test_data.tenant_id,
+            legal_entity_id=test_data.legal_entity_id,
+            pay_run_id=pay_run_id,
+            funding_model="prefund_all",
+            idempotency_key=f"commit_gate_{uuid4().hex[:8]}",
+            strict=True,
+        )
+
+        assert result.passed is False
+        assert result.outcome == "hard_fail"
+        assert result.shortfall == Decimal("9000.00")

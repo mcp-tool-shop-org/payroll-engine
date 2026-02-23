@@ -135,6 +135,8 @@ class FundingRiskAdvisor:
             risk_band,
             suggested_buffer,
             factors,
+            _suggestions,
+            _num_indicators,
         ) = self._model.predict(features)
 
         # Step 3: Check confidence threshold (risk_score acts as confidence here)

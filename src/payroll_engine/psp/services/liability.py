@@ -257,7 +257,9 @@ class LiabilityService:
             {"tenant_id": str(tenant_id), "idk": idempotency_key},
         ).fetchone()
 
-        return UUID(str(existing[0])) if existing else UUID(str(result[0]))
+        if existing:
+            return UUID(str(existing[0]))
+        raise RuntimeError("Liability event insert conflict but no existing row found")
 
     def update_recovery_status(
         self,
@@ -301,7 +303,7 @@ class LiabilityService:
         """)
 
         result = self.db.execute(sql, params)
-        return result.rowcount > 0
+        return result.rowcount > 0  # type: ignore[union-attr]
 
     def update_payment_instruction_liability(
         self,
@@ -340,7 +342,7 @@ class LiabilityService:
                 "notes": classification.determination_reason,
             },
         )
-        return result.rowcount > 0
+        return result.rowcount > 0  # type: ignore[union-attr]
 
     def get_pending_liabilities(
         self,
@@ -587,4 +589,6 @@ class AsyncLiabilityService:
             {"tenant_id": str(tenant_id), "idk": idempotency_key},
         )
         existing = existing_result.fetchone()
-        return UUID(str(existing[0]))
+        if existing:
+            return UUID(str(existing[0]))
+        raise RuntimeError("Liability event insert conflict but no existing row found")

@@ -2,6 +2,7 @@
 
 import asyncio
 from collections.abc import AsyncGenerator, Generator
+from decimal import Decimal
 from uuid import UUID, uuid4
 
 import pytest
@@ -81,6 +82,10 @@ async def psp_db(async_db: AsyncSession) -> AsyncGenerator[AsyncSession, None]:
         "liability_event",
         "third_party_obligation",
         "tax_liability",
+        "pay_line_item",
+        "pay_statement",
+        "pay_run_employee",
+        "pay_run",
     ]
 
     for table in psp_tables:
@@ -113,6 +118,10 @@ def psp_sync_db(sync_db: Session) -> Generator[Session, None, None]:
         "liability_event",
         "third_party_obligation",
         "tax_liability",
+        "pay_line_item",
+        "pay_statement",
+        "pay_run_employee",
+        "pay_run",
     ]
 
     for table in psp_tables:
@@ -216,6 +225,66 @@ class PSPTestData:
             accounts[acct_type] = UUID(str(result.scalar()))
         await db.commit()
         return accounts
+
+
+    def create_pay_run_data(
+        self,
+        db: Session,
+        net_pay: Decimal = Decimal("5000.00"),
+        num_employees: int = 1,
+    ) -> UUID:
+        """Create a pay run with pay_run_employee and pay_statement records.
+
+        Returns the pay_run_id for use with funding gate evaluation.
+        """
+        pay_run_id = uuid4()
+
+        # Create pay_run
+        db.execute(
+            text("""
+                INSERT INTO pay_run(pay_run_id, tenant_id, legal_entity_id, status, check_date)
+                VALUES (:pr_id, :tenant_id, :le_id, 'committed', CURRENT_DATE)
+            """),
+            {
+                "pr_id": str(pay_run_id),
+                "tenant_id": str(self.tenant_id),
+                "le_id": str(self.legal_entity_id),
+            },
+        )
+
+        per_employee_net = net_pay / num_employees
+
+        for _ in range(num_employees):
+            pre_id = uuid4()
+            employee_id = uuid4()
+
+            # Create pay_run_employee
+            db.execute(
+                text("""
+                    INSERT INTO pay_run_employee(pay_run_employee_id, pay_run_id, employee_id, net)
+                    VALUES (:pre_id, :pr_id, :emp_id, :net)
+                """),
+                {
+                    "pre_id": str(pre_id),
+                    "pr_id": str(pay_run_id),
+                    "emp_id": str(employee_id),
+                    "net": str(per_employee_net),
+                },
+            )
+
+            # Create pay_statement
+            db.execute(
+                text("""
+                    INSERT INTO pay_statement(pay_run_employee_id, net_pay, check_date)
+                    VALUES (:pre_id, :net_pay, CURRENT_DATE)
+                """),
+                {
+                    "pre_id": str(pre_id),
+                    "net_pay": str(per_employee_net),
+                },
+            )
+
+        return pay_run_id
 
 
 @pytest.fixture

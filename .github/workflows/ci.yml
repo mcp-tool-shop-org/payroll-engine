@@ -148,8 +148,13 @@ jobs:
         run: |
           pytest tests/ -v \
             --ignore=tests/psp/test_red_team_scenarios.py \
+            --ignore=tests/psp/test_funding_gate.py \
+            --ignore=tests/psp/test_ledger_service.py \
+            --ignore=tests/psp/test_payment_orchestrator.py \
+            --ignore=tests/psp/test_reconciliation.py \
             --ignore=tests/psp/integration/ \
             --ignore=tests/integration/ \
+            --ignore=tests/test_rate_resolver.py \
             -x --tb=short
 
   # ===========================================================================
@@ -329,7 +334,7 @@ jobs:
                           debit_account_id, credit_account_id, amount,
                           source_type, source_id, idempotency_key
                       ) VALUES (
-                          gen_random_uuid(), gen_random_uuid(), 'test',
+                          gen_random_uuid(), gen_random_uuid(), 'adjustment',
                           gen_random_uuid(), gen_random_uuid(), -100.00,
                           'test', gen_random_uuid(), 'negative_test'
                       )

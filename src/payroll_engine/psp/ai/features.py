@@ -328,9 +328,9 @@ class FeatureExtractor:
         amounts = [Decimal(str(p.get("amount", 0))) for p in payroll_history]
 
         if amounts:
-            avg_amount = sum(amounts) / len(amounts)
-            variance = sum((a - avg_amount) ** 2 for a in amounts) / len(amounts)
-            stddev_amount = Decimal(str(variance ** Decimal("0.5")))
+            avg_amount = sum(amounts, Decimal("0")) / len(amounts)
+            variance = sum(((a - avg_amount) ** 2 for a in amounts), Decimal("0")) / len(amounts)
+            stddev_amount = Decimal(str(float(variance) ** 0.5))
             max_amount = max(amounts)
         else:
             avg_amount = Decimal("0")
@@ -361,7 +361,7 @@ class FeatureExtractor:
 
         pending = self._get_pending_settlements(tenant_id)
         pending_count = len(pending)
-        pending_amount = sum(Decimal(str(p.get("amount", 0))) for p in pending)
+        pending_amount = sum((Decimal(str(p.get("amount", 0))) for p in pending), Decimal("0"))
 
         # Get balance info
         balance_info = self._get_balance_info(tenant_id)

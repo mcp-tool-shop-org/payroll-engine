@@ -130,6 +130,7 @@ class ReturnAdvisor:
             recovery_path,
             confidence,
             factors,
+            _num_indicators,
         ) = self._model.predict(features)
 
         # Step 3: Check confidence threshold

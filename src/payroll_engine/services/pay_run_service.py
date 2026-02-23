@@ -203,7 +203,7 @@ class PayRunService:
                 )
             )
 
-            if result.rowcount == 0:
+            if result.rowcount == 0:  # type: ignore[union-attr]
                 # Either already committed or status changed
                 await self.session.refresh(pay_run)
                 if pay_run.status == PayRunStatus.COMMITTED:
@@ -275,7 +275,7 @@ class PayRunService:
     ) -> None:
         """Handle side effects of approval transition."""
         # Lock all inputs
-        locked_count = await self.locking_service.lock_inputs_for_run(pay_run)
+        _locked_count = await self.locking_service.lock_inputs_for_run(pay_run)
 
         # Set approval timestamp
         pay_run.approved_at = datetime.utcnow()

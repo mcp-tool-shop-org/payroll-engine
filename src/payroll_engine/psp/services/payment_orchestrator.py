@@ -472,7 +472,7 @@ class PaymentOrchestrator:
             },
         )
 
-        if result.rowcount > 0 and new_status == "settled":
+        if result.rowcount > 0 and new_status == "settled":  # type: ignore[union-attr]
             # Record settlement ledger entry
             instr = self.db.execute(
                 text("""
@@ -491,7 +491,7 @@ class PaymentOrchestrator:
                     amount=Decimal(str(instr[0])),
                 )
 
-        return result.rowcount > 0
+        return result.rowcount > 0  # type: ignore[union-attr]
 
     def _record_payment_settled_entry(
         self,
@@ -870,7 +870,7 @@ class AsyncPaymentOrchestrator:
             },
         )
 
-        if result.rowcount > 0 and new_status == "settled":
+        if result.rowcount > 0 and new_status == "settled":  # type: ignore[union-attr]
             instr_result = await self.db.execute(
                 text("""
                     SELECT amount, legal_entity_id, purpose
@@ -889,7 +889,7 @@ class AsyncPaymentOrchestrator:
                     amount=Decimal(str(instr[0])),
                 )
 
-        return result.rowcount > 0
+        return result.rowcount > 0  # type: ignore[union-attr]
 
     async def _record_payment_settled_entry(
         self,

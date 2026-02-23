@@ -334,7 +334,8 @@ class TestEmployeeCalculationContext:
         assert ctx.gross == Decimal("0")
         assert ctx.net == Decimal("0")
         assert ctx.errors == []
-        assert ctx.taxable_wages is None
+        assert ctx.taxable_wages is not None
+        assert ctx.taxable_wages.federal == Decimal("0")
 
     def test_context_errors_are_mutable(self):
         """Can append errors to context."""

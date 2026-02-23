@@ -43,6 +43,7 @@ def init_db() -> tuple[AsyncEngine, async_sessionmaker[AsyncSession]]:
             expire_on_commit=False,
             autoflush=False,
         )
+    assert _session_factory is not None
     return _engine, _session_factory
 
 

@@ -350,6 +350,12 @@ class PayrollEngine:
                 )
                 continue
 
+            if adj.earning_code_id is None:
+                ctx.errors.append(
+                    f"Adjustment {adj.pay_input_adjustment_id} has no earning code"
+                )
+                continue
+
             line = LineItemBuilder.create_earning_line(
                 earning_code_id=adj.earning_code_id,
                 amount=amount,

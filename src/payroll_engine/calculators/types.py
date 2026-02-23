@@ -116,7 +116,7 @@ class TaxRule:
 
     rule_id: UUID
     rule_version_id: UUID
-    jurisdiction_id: UUID
+    jurisdiction_id: UUID | None
     tax_agency_id: UUID | None
     tax_type: str  # 'income', 'social_security', 'medicare', 'suta', 'futa', etc.
     brackets: list[TaxBracket]

@@ -352,7 +352,7 @@ class LedgerService:
             },
         )
 
-        return result.rowcount > 0
+        return result.rowcount > 0  # type: ignore[union-attr]
 
     def get_or_create_account(
         self,
@@ -634,7 +634,7 @@ class AsyncLedgerService:
             },
         )
 
-        return result.rowcount > 0
+        return result.rowcount > 0  # type: ignore[union-attr]
 
     async def get_or_create_account(
         self,

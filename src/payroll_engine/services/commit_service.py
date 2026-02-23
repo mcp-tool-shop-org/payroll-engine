@@ -115,7 +115,7 @@ class CommitService:
         result = await self.session.execute(stmt_insert)
 
         # Check if we inserted or if it existed
-        if result.rowcount == 0:
+        if result.rowcount == 0:  # type: ignore[union-attr]
             # Statement exists - verify calculation_id matches
             existing = await self.session.execute(
                 select(PayStatement).where(
@@ -200,7 +200,7 @@ class CommitService:
                 )
             )
             result = await self.session.execute(line_insert)
-            inserted_count += result.rowcount or 0
+            inserted_count += result.rowcount or 0  # type: ignore[union-attr]
 
         return inserted_count
 

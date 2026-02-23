@@ -70,7 +70,7 @@ class LockingService:
             )
             .values(locked_by_pay_run_id=pay_run_id, locked_at=locked_at)
         )
-        locked_count += time_entry_result.rowcount or 0
+        locked_count += time_entry_result.rowcount or 0  # type: ignore[union-attr]
 
         # Lock pay input adjustments targeted to this run or period
         adjustment_result = await self.session.execute(
@@ -85,7 +85,7 @@ class LockingService:
             )
             .values(locked_by_pay_run_id=pay_run_id, locked_at=locked_at)
         )
-        locked_count += adjustment_result.rowcount or 0
+        locked_count += adjustment_result.rowcount or 0  # type: ignore[union-attr]
 
         return locked_count
 
@@ -103,7 +103,7 @@ class LockingService:
             .where(TimeEntry.locked_by_pay_run_id == pay_run_id)
             .values(locked_by_pay_run_id=None, locked_at=None)
         )
-        unlocked_count += time_entry_result.rowcount or 0
+        unlocked_count += time_entry_result.rowcount or 0  # type: ignore[union-attr]
 
         # Unlock adjustments
         adjustment_result = await self.session.execute(
@@ -111,11 +111,11 @@ class LockingService:
             .where(PayInputAdjustment.locked_by_pay_run_id == pay_run_id)
             .values(locked_by_pay_run_id=None, locked_at=None)
         )
-        unlocked_count += adjustment_result.rowcount or 0
+        unlocked_count += adjustment_result.rowcount or 0  # type: ignore[union-attr]
 
         # Remove lock records
         await self.session.execute(
-            PayRunLock.__table__.delete().where(PayRunLock.pay_run_id == pay_run_id)
+            PayRunLock.__table__.delete().where(PayRunLock.pay_run_id == pay_run_id)  # type: ignore[union-attr]
         )
 
         return unlocked_count
@@ -148,7 +148,7 @@ class LockingService:
         pay_run_id = pay_run.pay_run_id
 
         # Check that time entries are still locked
-        unlocked_time = await self.session.execute(
+        _unlocked_time = await self.session.execute(
             select(TimeEntry)
             .where(
                 TimeEntry.locked_by_pay_run_id == pay_run_id,

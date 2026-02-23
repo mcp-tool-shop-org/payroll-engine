@@ -71,7 +71,7 @@ class FedNowStubProvider:
         Response is typically within seconds.
         """
         idempotency_key = instruction.get("idempotency_key", str(uuid.uuid4()))
-        payment_id = instruction.get("payment_instruction_id", str(uuid.uuid4()))
+        _payment_id = instruction.get("payment_instruction_id", str(uuid.uuid4()))
 
         # Generate stub message ID (real FedNow uses UETR format)
         message_id = f"FEDNOW{uuid.uuid4().hex[:20].upper()}"

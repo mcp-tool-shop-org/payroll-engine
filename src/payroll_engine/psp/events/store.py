@@ -122,7 +122,7 @@ class EventStore:
                 "version": stored.version,
             },
         )
-        return result.rowcount > 0
+        return result.rowcount > 0  # type: ignore[union-attr]
 
     def append_batch(self, events: list[DomainEvent]) -> int:
         """Append batch of events atomically.
@@ -354,7 +354,7 @@ class AsyncEventStore:
                 "version": stored.version,
             },
         )
-        return result.rowcount > 0
+        return result.rowcount > 0  # type: ignore[union-attr]
 
     async def append_batch(self, events: list[DomainEvent]) -> int:
         """Append batch of events atomically."""
