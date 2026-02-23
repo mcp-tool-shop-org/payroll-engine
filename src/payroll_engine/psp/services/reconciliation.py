@@ -335,7 +335,7 @@ class ReconciliationService:
             # Find the linked ledger entry
             link = self.db.execute(
                 text("""
-                    SELECT psp_ledger_entry_id, e.tenant_id, e.legal_entity_id
+                    SELECT e.psp_ledger_entry_id, e.tenant_id, e.legal_entity_id
                     FROM psp_settlement_link sl
                     JOIN psp_ledger_entry e ON e.psp_ledger_entry_id = sl.psp_ledger_entry_id
                     WHERE sl.psp_settlement_event_id = :settlement_id
@@ -660,7 +660,7 @@ class AsyncReconciliationService:
         if old_status == "settled" and new_status in ("returned", "reversed"):
             link_result = await self.db.execute(
                 text("""
-                    SELECT psp_ledger_entry_id, e.tenant_id, e.legal_entity_id
+                    SELECT e.psp_ledger_entry_id, e.tenant_id, e.legal_entity_id
                     FROM psp_settlement_link sl
                     JOIN psp_ledger_entry e ON e.psp_ledger_entry_id = sl.psp_ledger_entry_id
                     WHERE sl.psp_settlement_event_id = :settlement_id
