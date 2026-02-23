@@ -544,22 +544,19 @@ class TestReversalAbuse:
 
         assert rev1.is_new is True
 
-        # Attack: Try to reverse again with same key
-        rev2 = ledger.post_entry(
-            tenant_id=test_data.tenant_id,
-            legal_entity_id=test_data.legal_entity_id,
-            entry_type="reversal",
-            debit_account_id=accounts["client_funding_clearing"],
-            credit_account_id=accounts["psp_settlement_clearing"],
-            amount=Decimal("5000.00"),
-            source_type="psp_ledger_entry",
-            source_id=original.entry_id,
-            idempotency_key=reversal_key,
-        )
-
-        # Should return existing, not create new
-        assert rev2.is_new is False
-        assert rev2.entry_id == rev1.entry_id
+        # Attack: Try to reverse again — trigger blocks double-reversal
+        with pytest.raises(Exception, match="already been reversed"):
+            ledger.post_entry(
+                tenant_id=test_data.tenant_id,
+                legal_entity_id=test_data.legal_entity_id,
+                entry_type="reversal",
+                debit_account_id=accounts["client_funding_clearing"],
+                credit_account_id=accounts["psp_settlement_clearing"],
+                amount=Decimal("5000.00"),
+                source_type="psp_ledger_entry",
+                source_id=original.entry_id,
+                idempotency_key=f"reversal_attack_{uuid4().hex[:8]}",
+            )
 
 
 class TestLedgerImmutability:

@@ -86,6 +86,11 @@ async def psp_db(async_db: AsyncSession) -> AsyncGenerator[AsyncSession, None]:
         "pay_statement",
         "pay_run_employee",
         "pay_run",
+        "pay_schedule",
+        "employment",
+        "employee",
+        "legal_entity",
+        "tenant",
     ]
 
     for table in psp_tables:
@@ -122,6 +127,11 @@ def psp_sync_db(sync_db: Session) -> Generator[Session, None, None]:
         "pay_statement",
         "pay_run_employee",
         "pay_run",
+        "pay_schedule",
+        "employment",
+        "employee",
+        "legal_entity",
+        "tenant",
     ]
 
     for table in psp_tables:
