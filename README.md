@@ -15,14 +15,6 @@
 
 Deterministic append-only ledger. Explicit funding gates. Replayable events. Advisory-only AI (disabled by default). Correctness over convenience.
 
-## Quickstart
-
-```bash
-make up        # Start PostgreSQL
-make migrate   # Apply migrations
-make demo      # Run the demo
-```
-
 ## Trust Anchors
 
 Before adopting this library, review:

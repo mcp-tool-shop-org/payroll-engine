@@ -181,4 +181,5 @@ If a financial correctness bug is discovered:
 
 | Version | Date | Type | Notes |
 |---------|------|------|-------|
+| 0.2.0 | 2026-02-22 | Minor | Database constraint overhaul, CI fully green |
 | 0.1.0 | 2025-01-25 | Initial | First public release |

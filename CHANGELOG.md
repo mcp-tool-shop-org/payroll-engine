@@ -15,23 +15,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Added
-- (reserved)
+---
 
-### Changed
-- (reserved)
+## [0.2.0] - 2026-02-22
+
+**Database constraint overhaul — all 8 CI jobs green.**
 
 ### Fixed
-- (reserved)
+
+- **Migration 206 CHECK constraints** aligned with production code values: added all entry types, purposes, payee types, and statuses used by 201/202 services
+- **Dual-constraint conflict** resolved: original inline CHECK constraints from `CREATE TABLE` in 201/202 are now explicitly dropped before 206 replaces them with named constraints
+- **Status transition triggers** updated to allow all valid paths (e.g. `submitted → settled` for instant payment rails, `created → settled` for settlement events)
+- **Ambiguous column reference** in reconciliation SQL: `psp_ledger_entry_id` qualified with table alias in `_handle_status_change` JOIN query (both sync and async)
+- **Payroll stub migration** (200) updated with missing columns (`period_start`, `period_end`) and all stub tables needed by integration tests
+- **Double-reversal test** fixed to validate trigger behavior correctly (BEFORE INSERT trigger fires before ON CONFLICT)
+- **PSP facade** rewritten to match actual service APIs (57 pyright errors resolved)
+- **Type safety** restored: Decimal arithmetic, rowcount guards, None checks across all services
 
 ### Database / Migration Notes
-- (reserved)
+- Migration 206 substantially reworked — drops all original inline constraints before adding named replacements
+- Migration 200 adds `period_start` and `period_end` columns to `pay_run` stub
+- No new tables added; existing constraint definitions expanded
 
 ### Event Compatibility
-- (reserved)
+- No event changes
 
 ### Operational Notes
-- (reserved)
+- CI expanded to 8 jobs: core-only, lint, unit tests, DB integration, migration lint, constraint tests, event compat, demo smoke test
+- All red team / constraint tests now execute without skips
 
 ---
 
@@ -105,7 +116,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 #### DevOps
 - `docker-compose.yml` for local development
 - `Makefile` with one-command operations
-- GitHub Actions CI with 7 jobs:
+- GitHub Actions CI with 8 jobs:
   - Lint & type check
   - Unit tests
   - DB integration tests
@@ -190,5 +201,6 @@ Quick steps:
 - **MINOR**: New features, additive changes
 - **PATCH**: Bug fixes, documentation
 
-[Unreleased]: https://github.com/payroll-engine/payroll-engine/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/payroll-engine/payroll-engine/releases/tag/v0.1.0
+[Unreleased]: https://github.com/mcp-tool-shop-org/payroll-engine/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/mcp-tool-shop-org/payroll-engine/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/mcp-tool-shop-org/payroll-engine/releases/tag/v0.1.0
