@@ -450,7 +450,7 @@ class FundingGateService:
                 )
                 VALUES (
                     :tenant_id, :le, :pay_run_id, :gate_type,
-                    :outcome, :required, :available, :reasons::jsonb, :idk
+                    :outcome, :required, :available, CAST(:reasons AS jsonb), :idk
                 )
                 ON CONFLICT (tenant_id, idempotency_key) DO NOTHING
             """),
@@ -806,7 +806,7 @@ class AsyncFundingGateService:
                 )
                 VALUES (
                     :tenant_id, :le, :pay_run_id, :gate_type,
-                    :outcome, :required, :available, :reasons::jsonb, :idk
+                    :outcome, :required, :available, CAST(:reasons AS jsonb), :idk
                 )
                 ON CONFLICT (tenant_id, idempotency_key) DO NOTHING
             """),

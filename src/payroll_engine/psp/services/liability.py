@@ -219,7 +219,7 @@ class LiabilityService:
                 :error_origin, :liability_party, :loss_amount,
                 :recovery_path, 'pending',
                 :user_id, :reason,
-                :evidence::jsonb, :idk
+                CAST(:evidence AS jsonb), :idk
             )
             ON CONFLICT (tenant_id, idempotency_key)
             WHERE idempotency_key IS NOT NULL
@@ -549,7 +549,7 @@ class AsyncLiabilityService:
                 :error_origin, :liability_party, :loss_amount,
                 :recovery_path, 'pending',
                 :user_id, :reason,
-                :evidence::jsonb, :idk
+                CAST(:evidence AS jsonb), :idk
             )
             ON CONFLICT (tenant_id, idempotency_key)
             WHERE idempotency_key IS NOT NULL

@@ -112,7 +112,7 @@ class LedgerService:
             VALUES (
                 :tenant_id, :legal_entity_id, :entry_type, :debit_account_id, :credit_account_id,
                 :amount, :source_type, :source_id, :correlation_id, :idempotency_key,
-                :metadata_json::jsonb, :created_by_user_id
+                CAST(:metadata_json AS jsonb), :created_by_user_id
             )
             ON CONFLICT (tenant_id, idempotency_key) DO NOTHING
             RETURNING psp_ledger_entry_id
@@ -444,7 +444,7 @@ class AsyncLedgerService:
             VALUES (
                 :tenant_id, :legal_entity_id, :entry_type, :debit_account_id, :credit_account_id,
                 :amount, :source_type, :source_id, :correlation_id, :idempotency_key,
-                :metadata_json::jsonb, :created_by_user_id
+                CAST(:metadata_json AS jsonb), :created_by_user_id
             )
             ON CONFLICT (tenant_id, idempotency_key) DO NOTHING
             RETURNING psp_ledger_entry_id

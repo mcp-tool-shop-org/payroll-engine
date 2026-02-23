@@ -166,7 +166,7 @@ class ReconciliationService:
                 )
                 VALUES (
                     :bank_account_id, :rail, :direction, :amount, :currency,
-                    :status, :trace_id, :eff_date, :payload::jsonb
+                    :status, :trace_id, :eff_date, CAST(:payload AS jsonb)
                 )
                 ON CONFLICT (psp_bank_account_id, external_trace_id) DO NOTHING
                 RETURNING psp_settlement_event_id
@@ -498,7 +498,7 @@ class AsyncReconciliationService:
                 )
                 VALUES (
                     :bank_account_id, :rail, :direction, :amount, :currency,
-                    :status, :trace_id, :eff_date, :payload::jsonb
+                    :status, :trace_id, :eff_date, CAST(:payload AS jsonb)
                 )
                 ON CONFLICT (psp_bank_account_id, external_trace_id) DO NOTHING
                 RETURNING psp_settlement_event_id

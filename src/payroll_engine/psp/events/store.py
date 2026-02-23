@@ -106,7 +106,7 @@ class EventStore:
                 ) VALUES (
                     :event_id, :event_type, :category, :tenant_id,
                     :correlation_id, :causation_id, :timestamp,
-                    :payload::jsonb, :version
+                    CAST(:payload AS jsonb), :version
                 )
                 ON CONFLICT (event_id) DO NOTHING
             """),
@@ -338,7 +338,7 @@ class AsyncEventStore:
                 ) VALUES (
                     :event_id, :event_type, :category, :tenant_id,
                     :correlation_id, :causation_id, :timestamp,
-                    :payload::jsonb, :version
+                    CAST(:payload AS jsonb), :version
                 )
                 ON CONFLICT (event_id) DO NOTHING
             """),

@@ -216,7 +216,7 @@ class PaymentOrchestrator:
             VALUES (
                 :tenant_id, :legal_entity_id, :purpose, :direction, :amount, 'USD',
                 :payee_type, :payee_ref_id, :rsd, 'created',
-                :idk, :source_type, :source_id, :metadata::jsonb
+                :idk, :source_type, :source_id, CAST(:metadata AS jsonb)
             )
             ON CONFLICT (tenant_id, idempotency_key) DO NOTHING
             RETURNING payment_instruction_id, status
@@ -387,7 +387,7 @@ class PaymentOrchestrator:
                     status, request_payload_json
                 )
                 VALUES (
-                    :pi, :rail, :provider, :req, :status, :payload::jsonb
+                    :pi, :rail, :provider, :req, :status, CAST(:payload AS jsonb)
                 )
                 ON CONFLICT (provider, provider_request_id) DO NOTHING
                 RETURNING payment_attempt_id
@@ -641,7 +641,7 @@ class AsyncPaymentOrchestrator:
             VALUES (
                 :tenant_id, :legal_entity_id, :purpose, :direction, :amount, 'USD',
                 :payee_type, :payee_ref_id, :rsd, 'created',
-                :idk, :source_type, :source_id, :metadata::jsonb
+                :idk, :source_type, :source_id, CAST(:metadata AS jsonb)
             )
             ON CONFLICT (tenant_id, idempotency_key) DO NOTHING
             RETURNING payment_instruction_id, status
@@ -799,7 +799,7 @@ class AsyncPaymentOrchestrator:
                     status, request_payload_json
                 )
                 VALUES (
-                    :pi, :rail, :provider, :req, :status, :payload::jsonb
+                    :pi, :rail, :provider, :req, :status, CAST(:payload AS jsonb)
                 )
                 ON CONFLICT (provider, provider_request_id) DO NOTHING
                 RETURNING payment_attempt_id

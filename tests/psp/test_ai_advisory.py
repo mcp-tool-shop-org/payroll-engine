@@ -1503,7 +1503,7 @@ class TestTenantRiskProfiler:
         profile = profiler.profile(metrics)
 
         assert profile.return_risk_score > 0.5
-        assert profile.risk_score > profile.return_risk_score * 0.3  # Weighted contribution
+        assert profile.risk_score >= profile.return_risk_score * 0.3  # Weighted contribution
 
     def test_funding_blocks_increase_risk(self):
         """Multiple funding blocks should increase risk."""

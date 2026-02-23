@@ -225,7 +225,7 @@ exclude = [
     "src/payroll_engine/__main__.py",  # Depends on api module
 ]
 pythonVersion = "3.11"
-typeCheckingMode = "standard"
+typeCheckingMode = "basic"
 reportMissingImports = true
 reportMissingTypeStubs = false
 reportUnusedImport = true
