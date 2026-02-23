@@ -17,6 +17,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.2.1] - 2026-02-22
+
+### Fixed
+- **Release workflow**: SBOM generation updated for cyclonedx-bom v7 CLI (`--format` → `--of`)
+
+---
+
 ## [0.2.0] - 2026-02-22
 
 **Database constraint overhaul — all 8 CI jobs green.**
@@ -201,6 +208,7 @@ Quick steps:
 - **MINOR**: New features, additive changes
 - **PATCH**: Bug fixes, documentation
 
-[Unreleased]: https://github.com/mcp-tool-shop-org/payroll-engine/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/mcp-tool-shop-org/payroll-engine/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/mcp-tool-shop-org/payroll-engine/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/mcp-tool-shop-org/payroll-engine/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/mcp-tool-shop-org/payroll-engine/releases/tag/v0.1.0
