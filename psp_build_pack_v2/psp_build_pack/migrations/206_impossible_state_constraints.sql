@@ -28,7 +28,20 @@ ALTER TABLE psp_ledger_entry
 ALTER TABLE psp_ledger_entry
     ADD CONSTRAINT chk_ledger_entry_type_valid
     CHECK (entry_type IN (
+        -- Original 201 types (production code uses these)
         'funding_received',
+        'funding_returned',
+        'reserve_created',
+        'reserve_released',
+        'employee_payment_initiated',
+        'employee_payment_settled',
+        'employee_payment_failed',
+        'tax_payment_initiated',
+        'tax_payment_settled',
+        'third_party_payment_initiated',
+        'third_party_payment_settled',
+        'fee_assessed',
+        -- Additional 206 types
         'funding_withdrawal',
         'payment_debit',
         'payment_credit',
