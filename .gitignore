@@ -18,3 +18,7 @@ venv/
 htmlcov/
 .coverage
 *.cover
+site/.astro/
+site/node_modules/
+site/dist/
+node_modules/
