@@ -6,8 +6,6 @@
   <img src="https://raw.githubusercontent.com/mcp-tool-shop-org/payroll-engine/main/logo-payroll-engine.png" alt="Payroll Engine logo" width="400">
 </p>
 
-<h1 align="center">Payroll Engine</h1>
-
 <p align="center">
   <a href="https://github.com/mcp-tool-shop-org/payroll-engine/actions/workflows/ci.yml"><img src="https://github.com/mcp-tool-shop-org/payroll-engine/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://pypi.org/project/payroll-engine/"><img src="https://img.shields.io/pypi/v/payroll-engine" alt="PyPI"></a>
