@@ -3,9 +3,7 @@
 </p>
 
 <p align="center">
-  
-            <img src="https://raw.githubusercontent.com/mcp-tool-shop-org/brand/main/logos/payroll-engine/readme.png"
-           alt="Payroll Engine logo" width="400">
+  <img src="https://raw.githubusercontent.com/mcp-tool-shop-org/payroll-engine/main/logo-payroll-engine.png" alt="Payroll Engine logo" width="400">
 </p>
 
 <p align="center">
