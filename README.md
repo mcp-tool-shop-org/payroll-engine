@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/mcp-tool-shop-org/payroll-engine/main/logo.png" alt="Payroll Engine logo" width="400">
+  <img src="https://raw.githubusercontent.com/mcp-tool-shop-org/payroll-engine/main/logo-payroll-engine.png" alt="Payroll Engine logo" width="400">
 </p>
 
 <h1 align="center">Payroll Engine</h1>
