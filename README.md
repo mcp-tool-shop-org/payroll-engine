@@ -358,6 +358,31 @@ Key rules:
 - Event schema changes must pass compatibility check
 - All money operations require idempotency keys
 
+## Security & Data Scope
+
+| Aspect | Detail |
+|--------|--------|
+| **Data touched** | Financial transaction data (ledger entries, payment instructions, settlement records) in PostgreSQL. Event log payloads |
+| **Data NOT touched** | No telemetry. No analytics. No credential storage. No PII beyond tenant/account IDs |
+| **Permissions** | Read/write: PostgreSQL database via SQLAlchemy. No filesystem access beyond DB connection |
+| **Network** | PostgreSQL connection only. No outbound HTTP unless payment provider configured by adopter |
+| **Telemetry** | None collected or sent |
+
+See [SECURITY.md](SECURITY.md) for vulnerability reporting. See [docs/threat_model.md](docs/threat_model.md) for the complete threat model.
+
+## Scorecard
+
+| Category | Score |
+|----------|-------|
+| A. Security | 10 |
+| B. Error Handling | 10 |
+| C. Operator Docs | 10 |
+| D. Shipping Hygiene | 10 |
+| E. Identity (soft) | 10 |
+| **Overall** | **50/50** |
+
+> Full audit: [SHIP_GATE.md](SHIP_GATE.md) · [SCORECARD.md](SCORECARD.md)
+
 ## License
 
 MIT License. See [LICENSE](LICENSE).

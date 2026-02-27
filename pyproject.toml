@@ -4,7 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "payroll-engine"
-version = "0.2.3"
+version = "1.0.0"
+>>>>>>> 6db7eed (Promote to v1.0.0 — shipcheck audit pass (27/0/10))
 description = "US Payroll SaaS Engine with PSP - ledger, payment rails, settlement, and liability management"
 readme = "README.md"
 license = "MIT"
@@ -23,7 +24,7 @@ keywords = [
     "saas",
 ]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Intended Audience :: Financial and Insurance Industry",
     "License :: OSI Approved :: MIT License",

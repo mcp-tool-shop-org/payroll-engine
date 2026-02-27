@@ -17,6 +17,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [1.0.0] - 2026-02-27
+
+### Changed
+- Promoted to v1.0.0 — production-stable release
+- Shipcheck audit pass: SECURITY.md, threat model, structured errors, operator docs
+
+### Database / Migration Notes
+- No migration changes
+
+### Event Compatibility
+- No event changes
+
+### Operational Notes
+- No operational changes
+
+---
+
 ## [0.2.1] - 2026-02-22
 
 ### Fixed
