@@ -14,7 +14,7 @@ export const config: SiteConfig = {
     headlineAccent: 'Correctness over convenience.',
     description: 'A library-first PSP core for payroll and regulated money movement. Append-only ledger, explicit funding gates, replayable events, and advisory-only AI.',
     primaryCta: { href: '#quick-start', label: 'Get started' },
-    secondaryCta: { href: '#features', label: 'Learn more' },
+    secondaryCta: { href: 'handbook/', label: 'Read the Handbook' },
     previews: [
       { label: 'Install', code: 'pip install payroll-engine' },
       { label: 'Init', code: 'psp = PSP(session=session, config=config)' },
