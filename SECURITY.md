@@ -74,6 +74,10 @@ When using PSP:
 - Event replay assumes event store integrity
 - Provider credentials are passed via config - secure them appropriately
 
+### Accepted Risks
+
+- **Penetration testing**: No formal pen test has been conducted. This is an accepted risk for the current prototype stage. A pen test should be performed before any production deployment handling real financial data.
+
 ## Security Updates
 
 Security fixes are released as patch versions (e.g., 0.1.1).
