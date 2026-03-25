@@ -46,9 +46,16 @@ class PSPCli:
 
     def _build_parser(self) -> argparse.ArgumentParser:
         """Build argument parser."""
+        from payroll_engine import __version__
+
         parser = argparse.ArgumentParser(
-            prog="python -m payroll_engine.psp.cli",
+            prog="psp",
             description="PSP operational tools",
+        )
+        parser.add_argument(
+            "--version", "-V",
+            action="version",
+            version=f"%(prog)s {__version__}",
         )
         subparsers = parser.add_subparsers(dest="command", help="Commands")
 

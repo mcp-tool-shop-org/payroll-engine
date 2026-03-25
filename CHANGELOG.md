@@ -17,6 +17,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [1.0.1] - 2026-03-25
+
+### Added
+- `--version` / `-V` flag on `psp` CLI
+- Version alignment tests (3 new tests)
+
+### Fixed
+- `__version__` was stuck at "0.1.0" — now "1.0.1" matching pyproject.toml
+- SECURITY.md had placeholder email `security@payroll-engine.example.com`
+- SECURITY.md referenced "0.1.1" for patch versions instead of "1.0.1"
+- CLI `prog` was `python -m payroll_engine.psp.cli` — now `psp`
+
+### Database / Migration Notes
+- No migration changes
+
+### Event Compatibility
+- No event changes
+
+### Operational Notes
+- No operational changes
+
+---
+
 ## [1.0.0] - 2026-02-27
 
 ### Changed
@@ -225,7 +248,9 @@ Quick steps:
 - **MINOR**: New features, additive changes
 - **PATCH**: Bug fixes, documentation
 
-[Unreleased]: https://github.com/mcp-tool-shop-org/payroll-engine/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/mcp-tool-shop-org/payroll-engine/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/mcp-tool-shop-org/payroll-engine/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/mcp-tool-shop-org/payroll-engine/compare/v0.2.1...v1.0.0
 [0.2.1]: https://github.com/mcp-tool-shop-org/payroll-engine/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/mcp-tool-shop-org/payroll-engine/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/mcp-tool-shop-org/payroll-engine/releases/tag/v0.1.0

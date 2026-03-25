@@ -1,3 +1,3 @@
-"""US Payroll SaaS Engine - Phase 1."""
+"""US Payroll SaaS Engine — library-first PSP core for payroll."""
 
-__version__ = "0.1.0"
+__version__ = "1.0.1"

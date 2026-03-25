@@ -12,7 +12,7 @@
 
 Instead, please report them via email to:
 
-**security@payroll-engine.example.com**
+**64996768+mcp-tool-shop@users.noreply.github.com**
 
 Include:
 - Description of the vulnerability
@@ -80,6 +80,6 @@ When using PSP:
 
 ## Security Updates
 
-Security fixes are released as patch versions (e.g., 0.1.1).
+Security fixes are released as patch versions (e.g., 1.0.1).
 
 Subscribe to releases on GitHub to be notified of security updates.
