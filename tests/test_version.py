@@ -5,8 +5,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
-
 ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -37,6 +35,7 @@ def test_cli_version_flag():
         [sys.executable, "-m", "payroll_engine.psp.cli", "--version"],
         capture_output=True,
         text=True,
+        check=False,
     )
     assert result.returncode == 0
     assert "psp" in result.stdout
