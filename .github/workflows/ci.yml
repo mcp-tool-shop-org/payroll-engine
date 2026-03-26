@@ -436,7 +436,8 @@ jobs:
           pip install ".[dev]"
 
       - name: Run pip-audit
-        run: pip-audit --strict --desc --skip-editable
+        # --strict removed: local unpublished versions are not on PyPI
+        run: pip-audit --desc
 
   # ===========================================================================
   # All Checks Must Pass
