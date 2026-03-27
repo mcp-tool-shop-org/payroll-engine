@@ -29,6 +29,7 @@ Payroll Engine is built for teams that move money in regulated contexts:
 | [Usage](/payroll-engine/handbook/usage/) | Library integration, CLI tools, and testing |
 | [Concepts](/payroll-engine/handbook/concepts/) | Core principles — why the system works this way |
 | [Reference](/payroll-engine/handbook/reference/) | API stability, guarantees, AI advisory, and security |
+| [Beginners](/payroll-engine/handbook/beginners/) | New to payment systems? Start here for the fundamentals |
 
 ## Trust anchors
 

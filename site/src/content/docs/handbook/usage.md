@@ -12,30 +12,21 @@ Payroll Engine is a library, not a service. You embed it inside your application
 The facade is the **only blessed integration path**. Do not import internal services directly — their interfaces may change without notice.
 
 ```python
-from payroll_engine.psp import PSP, PSPConfig
-from payroll_engine.psp.config import (
-    LedgerConfig,
-    FundingGateConfig,
-    ProviderConfig,
-    EventStoreConfig,
+from payroll_engine.psp import PSP
+from payroll_engine.psp.providers.ach_stub import AchStubProvider
+
+# The facade accepts an optional PSPConfig (from psp.psp, not psp.config)
+# and a dict of named rail providers.
+psp = PSP(
+    session=db_session,
+    providers={"ach": AchStubProvider()},
 )
 
-config = PSPConfig(
-    tenant_id=tenant_id,
-    legal_entity_id=legal_entity_id,
-    ledger=LedgerConfig(require_balanced_entries=True),
-    funding_gate=FundingGateConfig(
-        commit_gate_enabled=True,
-        pay_gate_enabled=True,  # NEVER set to False in production
-    ),
-    providers=[
-        ProviderConfig(name="ach", rail="ach", credentials={...}),
-    ],
-    event_store=EventStoreConfig(),
-)
-
-psp = PSP(session=db_session, config=config)
+# For production, register real providers:
+# psp.register_provider("ach", your_ach_provider)
 ```
+
+The separate `PSPConfig` in `payroll_engine.psp.config` (with `LedgerConfig`, `FundingGateConfig`, `ProviderConfig`, `EventStoreConfig`) defines the configuration schema for your application's setup layer. The facade's own `PSPConfig` controls gate behavior and default rail selection at runtime.
 
 :::caution
 Configuration is explicit — there are no magic defaults, no implicit environment variables, and no hidden globals. Every setting that affects money movement must be passed in deliberately.
@@ -46,12 +37,28 @@ Configuration is explicit — there are no magic defaults, no implicit environme
 The commit step runs the **commit gate** (do we have the money to promise these payments?) and creates fund reservations.
 
 ```python
+from payroll_engine.psp.psp import PayrollBatch, PayrollItem
+
+batch = PayrollBatch(
+    batch_id=batch_id,
+    tenant_id=tenant_id,
+    legal_entity_id=legal_entity_id,
+    pay_period_id=pay_period_id,
+    funding_account_id=funding_account_id,
+    items=[PayrollItem(payee_type="employee", payee_ref_id=emp_id, amount=amount, purpose="employee_net")],
+    effective_date=date.today(),
+    idempotency_key=f"commit:{batch_id}",
+)
+
 commit_result = psp.commit_payroll_batch(batch)
 
-# commit_result.is_new == True  → newly committed
-# commit_result.is_new == False → idempotent duplicate (same reservation returned)
-# commit_result.reservation_ids → list of reservation UUIDs
-# commit_result.total_reserved  → Decimal total held
+# commit_result.status          → CommitStatus enum (APPROVED, BLOCKED_POLICY, BLOCKED_FUNDS, PARTIAL)
+# commit_result.batch_id        → UUID of the batch
+# commit_result.reservation_id  → UUID of the fund reservation (or None if blocked)
+# commit_result.total_amount    → Decimal total committed
+# commit_result.approved_count  → number of items approved
+# commit_result.blocked_count   → number of items blocked
+# commit_result.correlation_id  → UUID for tracing
 ```
 
 ### Executing payments
@@ -63,12 +70,17 @@ execute_result = psp.execute_payments(
     tenant_id=tenant_id,
     legal_entity_id=legal_entity_id,
     batch_id=batch_id,
-    scheduled_date=date.today(),
+    funding_account_id=funding_account_id,
+    items=batch.items,
+    reservation_id=commit_result.reservation_id,
+    rail="ach",  # optional, defaults to config.default_rail
 )
 
+# execute_result.status          → ExecuteStatus enum (SUCCESS, PARTIAL, FAILED, BLOCKED)
 # execute_result.submitted_count → number sent to provider
 # execute_result.failed_count    → number that failed the pay gate
-# execute_result.instructions    → per-instruction results
+# execute_result.failures        → list of failure detail dicts
+# execute_result.correlation_id  → UUID for tracing
 ```
 
 ### Ingesting settlement feeds
@@ -83,30 +95,56 @@ ingest_result = psp.ingest_settlement_feed(
     records=settlement_records,
 )
 
-# ingest_result.matched_count   → successfully matched to instructions
-# ingest_result.unmatched_count → records with no matching instruction
-# ingest_result.duplicate_count → already-processed records (idempotent)
+# ingest_result.status              → IngestStatus enum (SUCCESS, PARTIAL, FAILED)
+# ingest_result.records_processed   → total records handled
+# ingest_result.records_matched     → successfully matched to instructions
+# ingest_result.records_created     → new settlement records created
+# ingest_result.records_failed      → records that failed processing
+# ingest_result.unmatched_trace_ids → list of trace IDs with no matching instruction
+# ingest_result.correlation_id      → UUID for tracing
 ```
 
 Unmatched settlements are flagged for manual review. The system never auto-credits an account from an unmatched record.
 
-### Querying balances
+### Handling provider callbacks
+
+When a provider sends an async status update (webhook), the facade processes it idempotently:
 
 ```python
-balance = psp.get_balance(tenant_id=tenant_id, account_id=account_id)
+callback_result = psp.handle_provider_callback(
+    tenant_id=tenant_id,
+    provider_name="ach",
+    callback_type="settlement",
+    payload=webhook_payload,
+)
+
+# callback_result.status → CallbackStatus enum (PROCESSED, DUPLICATE, INVALID, UNKNOWN)
+```
+
+### Querying balances
+
+Balance queries use the `LedgerService` directly, not the PSP facade:
+
+```python
+from payroll_engine.psp.services.ledger_service import LedgerService
+
+ledger = LedgerService(session)
+balance = ledger.get_balance(tenant_id=tenant_id, account_id=account_id)
 
 # balance.total     → all credits minus all debits
 # balance.reserved  → funds held by active reservations
 # balance.available → total minus reserved (what can be disbursed)
-# balance.as_of     → timestamp of the computation
 ```
 
 ### Replaying events
 
-Every state change in the system emits a domain event. You can replay them for debugging, auditing, or rebuilding state.
+Every state change in the system emits a domain event. Replay uses the `EventStore` directly:
 
 ```python
-for event in psp.replay_events(
+from payroll_engine.psp.events.store import EventStore
+
+store = EventStore(session)
+for event in store.replay(
     tenant_id=tenant_id,
     after=datetime(2025, 1, 1),
     event_types=["PaymentSettled", "PaymentReturned"],
@@ -117,20 +155,16 @@ for event in psp.replay_events(
 
 ## Idempotency
 
-Every operation that creates or modifies data returns a result with an `is_new` flag. This is critical for safe retries.
+Every operation uses idempotency keys to prevent duplicate processing. The `PayrollBatch.idempotency_key` ensures safe retries at the commit level, and the `LedgerService` and `EventStore` enforce idempotency at the database level via unique constraints on `(tenant_id, idempotency_key)`.
 
 ```python
-result = psp.commit_payroll_batch(batch)
-
-if result.is_new:
-    # First call — reservation was created
-    notify_downstream(result.reservation_ids)
-else:
-    # Duplicate call — same reservation returned, no side effects
-    log.info(f"Duplicate commit, returning existing {result.batch_id}")
+# Safe retry pattern — same batch, same idempotency_key
+result1 = psp.commit_payroll_batch(batch)
+result2 = psp.commit_payroll_batch(batch)
+# result1.batch_id == result2.batch_id — no duplicate reservation created
 ```
 
-The pattern applies everywhere: ledger postings, payment instructions, settlement records, and domain events. A duplicate is not an error — it is expected behavior in a system that handles retries correctly.
+At the service level, the `PostResult.is_new` flag indicates whether a ledger entry was newly created or already existed. Downstream actions (emitting events, notifications) should only fire when `is_new` is `True`.
 
 :::tip
 Use stable, deterministic idempotency keys that encode the logical operation:

@@ -158,29 +158,28 @@ The demo shows the full lifecycle:
 PSP is a library, not a service. Use it inside your application:
 
 ```python
-from payroll_engine.psp import PSP, PSPConfig, LedgerConfig, FundingGateConfig
+from payroll_engine.psp import PSP
+from payroll_engine.psp.psp import PayrollBatch, PayrollItem
+from payroll_engine.psp.providers.ach_stub import AchStubProvider
 
-# Explicit configuration (no magic, no env vars)
-config = PSPConfig(
-    tenant_id=tenant_id,
-    legal_entity_id=legal_entity_id,
-    ledger=LedgerConfig(require_balanced_entries=True),
-    funding_gate=FundingGateConfig(pay_gate_enabled=True),  # NEVER False
-    providers=[...],
-    event_store=EventStoreConfig(),
-)
+# Single entry point — explicit provider wiring, no hidden globals
+psp = PSP(session=session, providers={"ach": AchStubProvider()})
 
-# Single entry point
-psp = PSP(session=session, config=config)
-
-# Commit payroll (creates reservation)
+# Commit payroll (runs commit gate, creates reservation)
 commit_result = psp.commit_payroll_batch(batch)
 
-# Execute payments (pay gate runs automatically)
-execute_result = psp.execute_payments(batch)
+# Execute payments (pay gate runs automatically before submission)
+execute_result = psp.execute_payments(
+    tenant_id=tenant_id, legal_entity_id=legal_entity_id,
+    batch_id=batch.batch_id, funding_account_id=funding_account_id,
+    items=batch.items, reservation_id=commit_result.reservation_id,
+)
 
-# Ingest settlement feed
-ingest_result = psp.ingest_settlement_feed(records)
+# Ingest settlement feed (reconcile with bank confirmation)
+ingest_result = psp.ingest_settlement_feed(
+    tenant_id=tenant_id, bank_account_id=bank_account_id,
+    provider_name="ach", records=settlement_records,
+)
 ```
 
 ## Documentation

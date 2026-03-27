@@ -63,6 +63,9 @@ Payroll Engine includes optional AI features (installed via `pip install payroll
 - **Risk scoring** — score a payroll batch for anomalies before commit
 - **Return analysis** — classify return patterns and suggest process improvements
 - **Runbook suggestions** — recommend operational actions based on event history
+- **Counterfactual simulation** — model "what-if" scenarios for funding and payment decisions
+- **Tenant risk profiling** — assess overall risk posture for a tenant based on historical patterns
+- **Funding risk prediction** — predict funding shortfall probability with suggested reserve buffers
 
 ### What AI cannot do
 
@@ -87,14 +90,18 @@ If you install only `payroll-engine` (no `[ai]` extra), the AI module is never l
 | `legal_entity_id` | UUID | yes | Legal entity for compliance |
 | `ledger` | LedgerConfig | yes | Ledger behavior |
 | `funding_gate` | FundingGateConfig | yes | Gate configuration |
-| `providers` | list[ProviderConfig] | yes | Payment rail providers |
-| `event_store` | EventStoreConfig | no | Event store settings |
+| `providers` | list[ProviderConfig] | yes | Payment rail providers (at least one required, names must be unique) |
+| `event_store` | EventStoreConfig | yes | Event store settings |
+| `reconciliation` | ReconciliationConfig | no | Reconciliation behavior (defaults provided) |
+| `liability` | LiabilityConfig | no | Liability classification behavior (defaults provided) |
 
 ### LedgerConfig
 
 | Field | Default | Purpose |
 |-------|---------|---------|
 | `require_balanced_entries` | `True` | Every debit must have a matching credit |
+| `allow_negative_balances` | `False` | Allow accounts to go negative (only enable for liability accounts) |
+| `enable_reservations` | `True` | Balance checks consider active reservations |
 
 ### FundingGateConfig
 
@@ -102,19 +109,51 @@ If you install only `payroll-engine` (no `[ai]` extra), the AI module is never l
 |-------|---------|---------|
 | `commit_gate_enabled` | `True` | Run the commit gate on batch submission |
 | `pay_gate_enabled` | `True` | Run the pay gate before payment execution |
-| `shortfall_policy` | `"hard_fail"` | Commit gate behavior on insufficient funds |
+| `reservation_ttl_hours` | `48` | How long reservations remain valid before funds are released (1-168) |
+| `allow_partial_funding` | `False` | Allow partial batch execution when full funding is unavailable |
 
 :::caution
-Setting `pay_gate_enabled=False` is rejected in production. The facade checks and raises `ConfigurationError` if you attempt it outside test environments.
+Setting `pay_gate_enabled=False` is only valid for test environments. The `validate_production_config()` helper flags this as a critical issue.
 :::
 
 ### ProviderConfig
 
-| Field | Purpose |
-|-------|---------|
-| `name` | Provider identifier (e.g., `"ach"`, `"fednow"`) |
-| `rail` | Payment rail type |
-| `credentials` | Provider-specific authentication |
+| Field | Default | Purpose |
+|-------|---------|---------|
+| `name` | (required) | Unique provider identifier (e.g., `"primary_ach"`) |
+| `provider_type` | (required) | Payment rail type: `"ach"`, `"fednow"`, `"wire"`, `"rtp"`, or `"check"` |
+| `sandbox` | `True` | Use sandbox/test environment |
+| `credentials` | `{}` | Provider-specific authentication (dict) |
+| `webhook_secret` | `None` | Secret for validating incoming webhooks |
+| `timeout_seconds` | `30` | Request timeout |
+| `retry_count` | `3` | Number of retries on failure |
+
+### ReconciliationConfig
+
+| Field | Default | Purpose |
+|-------|---------|---------|
+| `auto_match` | `True` | Automatically match settlements to payments |
+| `match_tolerance_cents` | `0` | Amount tolerance for fuzzy matching (0 = exact match) |
+| `unmatched_alert_threshold` | `10` | Alert when unmatched count exceeds this |
+| `stale_payment_days` | `7` | Days after which unmatched payments are flagged |
+
+### LiabilityConfig
+
+| Field | Default | Purpose |
+|-------|---------|---------|
+| `auto_classify` | `True` | Automatically classify liability on returns |
+| `default_recovery_path` | `"manual_review"` | Recovery path when classification is ambiguous |
+| `employer_return_codes` | `("R01","R02","R03","R04","R07","R08","R10")` | Return codes defaulting to employer liability |
+| `platform_return_codes` | `("R05","R06","R09")` | Return codes defaulting to platform liability |
+
+### EventStoreConfig
+
+| Field | Default | Purpose |
+|-------|---------|---------|
+| `retention_days` | `None` | Days to retain events (`None` = forever) |
+| `enable_replay` | `True` | Allow event replay |
+| `enable_subscriptions` | `True` | Allow event subscriptions |
+| `batch_size` | `1000` | Events fetched per query (1-10000) |
 
 ## Error contract
 
@@ -164,11 +203,11 @@ The full threat model is documented in `docs/threat_model.md` using STRIDE metho
 - **Denial of service** — Idempotency prevents duplicate processing. Rate limiting on CLI and API endpoints.
 - **Elevation of privilege** — AI module has read-only data access. No code path from advisory output to money movement.
 
-### What Payroll Engine does not do
+### What the PSP core does not do
 
-These are documented in `docs/non_goals.md`:
+These are documented in `docs/non_goals.md`. Note that the PSP core is a library; the optional `[web]` extra provides a reference FastAPI layer, but the core itself:
 
-- Does not provide a UI or API server (it is a library)
+- Does not provide a UI (the optional API server is a thin integration layer, not a product)
 - Does not manage user authentication or authorization
 - Does not handle tax calculations or withholding
 - Does not provide payroll scheduling or calendar management
